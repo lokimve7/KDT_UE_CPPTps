@@ -4,6 +4,8 @@
 #include "TpsPlayer.h"
 #include <GameFramework/SpringArmComponent.h>
 #include <Camera/CameraComponent.h>
+#include <GameFramework/CharacterMovementComponent.h>
+#include <Kismet/GameplayStatics.h>
 
 // Sets default values
 ATpsPlayer::ATpsPlayer()
@@ -43,13 +45,35 @@ ATpsPlayer::ATpsPlayer()
 void ATpsPlayer::BeginPlay()
 {
 	Super::BeginPlay();
+
+	// 움직이는 속력을 moveSpeed 로 하자
+	GetCharacterMovement()->MaxWalkSpeed = moveSpeed;
+
+	// Controller 의 회전값을 따라 갈지 여부
+	bUseControllerRotationYaw = true;
+	arm->bUsePawnControlRotation = true;
+
+	// 카메라 상/하 회전값 을 제한 (min, max 설정)
+	APlayerController* playerCon = GetWorld()->GetFirstPlayerController();
+	playerCon->PlayerCameraManager->ViewPitchMin = -60;
+	playerCon->PlayerCameraManager->ViewPitchMax = 60;
+
+	/*APlayerCameraManager* camManager = UGameplayStatics::GetPlayerCameraManager(GetWorld(), 0);
+	camManager->ViewPitchMin = -60;
+	camManager->ViewPitchMax = 60;*/
+
+	// 점프 횟수 제한
+	JumpMaxCount = 3;
 }
 
 // Called every frame
 void ATpsPlayer::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
+		
+	MoveAction();
 
+	// RotateAction();	
 }
 
 // Called to bind functionality to input
@@ -57,6 +81,79 @@ void ATpsPlayer::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent
 {
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
 	
+	// A, D
+	PlayerInputComponent->BindAxis(TEXT("Horizontal"), this, &ATpsPlayer::InputHorizontal);
+
+	// W, S
+	PlayerInputComponent->BindAxis(TEXT("Vertical"), this, &ATpsPlayer::InputVertical);
+
+	// 마우스 좌우 움직일 때 
+	PlayerInputComponent->BindAxis(TEXT("MouseX"), this, &ATpsPlayer::InputMouseX);
+	// 마우스 상하 움직일 때
+	PlayerInputComponent->BindAxis(TEXT("MouseY"), this, &ATpsPlayer::InputMouseY);
+
+	// 스페이스바 눌렀을 때 
+	PlayerInputComponent->BindAction(TEXT("Jump"), IE_Pressed, this, &ATpsPlayer::InputJump);
 }
 
+void ATpsPlayer::MoveAction()
+{
+	//// p = p0 + vt
+	//FVector p0 = GetActorLocation();
+	//FVector dir = GetActorRightVector() * moveInput.Y +
+	//	GetActorForwardVector() * moveInput.X;
+	//// dir 의 크기를 1로 만든다.
+	//dir.Normalize();
+	//// vt 만큼 움직여라
+	//FVector vt = dir * moveSpeed * DeltaTime;
+	//// 새로 이동해야 하는 위치
+	//FVector p = p0 + vt;
+	//SetActorLocation(p);
+
+	FVector dir = GetActorRightVector() * moveInput.Y +
+		GetActorForwardVector() * moveInput.X;
+	// dir 의 크기를 1로 만든다.
+	dir.Normalize();
+
+	// dir 방향으로 움직여라
+	AddMovementInput(dir);
+}
+
+void ATpsPlayer::RotateAction()
+{
+	// 나의 회전 yaw (z축) 값 셋팅
+	SetActorRotation(FRotator(0, mx, 0));
+	// spring arm 의 회전 pitch (y축) 값 셋팅
+	arm->SetRelativeRotation(FRotator(my, 0, 0));
+}
+
+void ATpsPlayer::InputHorizontal(float value)
+{
+	moveInput.Y = value;
+}
+
+void ATpsPlayer::InputVertical(float value)
+{
+	moveInput.X = value;
+}
+
+void ATpsPlayer::InputMouseX(float value)
+{
+	AddControllerYawInput(value);
+
+	// 좌, 우 회전하는 값을 누적
+	//mx += value;
+}
+
+void ATpsPlayer::InputMouseY(float value)
+{
+	AddControllerPitchInput(value);
+	// 상, 하 회전하는 값을 누적
+	//my += value;
+}
+
+void ATpsPlayer::InputJump()
+{
+	Jump();
+}
 

@@ -32,5 +32,25 @@ public:
 
 	UPROPERTY(EditAnywhere)
 	class UCameraComponent* cam;
+
+	// float h;, float v;
+	FVector moveInput = FVector(0);
+
+	float moveSpeed = 500;
+
+	// È¸Àü °ª
+	float mx = 0;
+	float my = 0;
+
+public:
+
+	void MoveAction();
+	void RotateAction();
+
+	void InputHorizontal(float value);
+	void InputVertical(float value);
+	void InputMouseX(float value);
+	void InputMouseY(float value);
+	void InputJump();
 };
 
