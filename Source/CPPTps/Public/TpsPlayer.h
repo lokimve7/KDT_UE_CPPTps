@@ -42,6 +42,14 @@ public:
 	float mx = 0;
 	float my = 0;
 
+	// Input Mapping Context 담을 변수
+	UPROPERTY(EditAnywhere)
+	class UInputMappingContext* imcDefault;
+
+	// InputAction Jump
+	UPROPERTY(EditAnywhere)
+	class UInputAction* ia_Jump;
+
 public:
 
 	void MoveAction();
@@ -51,6 +59,9 @@ public:
 	void InputVertical(float value);
 	void InputMouseX(float value);
 	void InputMouseY(float value);
+
 	void InputJump();
+	void EnhancedJump();
+
 };
 

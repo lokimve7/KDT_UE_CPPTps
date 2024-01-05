@@ -6,6 +6,10 @@
 #include <Camera/CameraComponent.h>
 #include <GameFramework/CharacterMovementComponent.h>
 #include <Kismet/GameplayStatics.h>
+#include <InputMappingContext.h>
+#include <InputAction.h>
+#include <EnhancedInputSubsystems.h>
+#include <EnhancedInputComponent.h>
 
 // Sets default values
 ATpsPlayer::ATpsPlayer()
@@ -13,6 +17,19 @@ ATpsPlayer::ATpsPlayer()
  	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 
+	// imc default 파일 읽어오자
+	ConstructorHelpers::FObjectFinder<UInputMappingContext> tempImc(TEXT("/Script/EnhancedInput.InputMappingContext'/Game/Input/IMC_Default.IMC_Default'"));
+	if (tempImc.Succeeded())
+	{
+		imcDefault = tempImc.Object;
+	}
+
+	// ia_jump 파일 읽어오자
+	ConstructorHelpers::FObjectFinder<UInputAction> tempIAJump(TEXT("/Script/EnhancedInput.InputAction'/Game/Input/IA_Jump.IA_Jump'"));
+	if (tempIAJump.Succeeded())
+	{
+		ia_Jump = tempIAJump.Object;
+	}
 
 	// Skeletal Mesh 읽어오자
 	ConstructorHelpers::FObjectFinder<USkeletalMesh> tempMesh(TEXT("/Script/Engine.SkeletalMesh'/Game/AnimStarterPack/UE4_Mannequin/Mesh/SK_Mannequin.SK_Mannequin'"));
@@ -64,6 +81,13 @@ void ATpsPlayer::BeginPlay()
 
 	// 점프 횟수 제한
 	JumpMaxCount = 3;
+
+	// APlayerController 가져오자
+	APlayerController* playerController = Cast<APlayerController>(GetController());
+	//subSystem 을 가져오자	
+	auto subSystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(playerController->GetLocalPlayer());
+	// imcDefault 추가 하자
+	subSystem->AddMappingContext(imcDefault, 0);
 }
 
 // Called every frame
@@ -80,6 +104,13 @@ void ATpsPlayer::Tick(float DeltaTime)
 void ATpsPlayer::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
+
+	UEnhancedInputComponent* input = Cast<UEnhancedInputComponent>(PlayerInputComponent);
+	if (input)
+	{
+		input->BindAction(ia_Jump, ETriggerEvent::Started, this, &ATpsPlayer::EnhancedJump);
+	}
+
 	
 	// A, D
 	PlayerInputComponent->BindAxis(TEXT("Horizontal"), this, &ATpsPlayer::InputHorizontal);
@@ -143,6 +174,7 @@ void ATpsPlayer::InputMouseX(float value)
 
 	// 좌, 우 회전하는 값을 누적
 	//mx += value;
+
 }
 
 void ATpsPlayer::InputMouseY(float value)
@@ -153,6 +185,11 @@ void ATpsPlayer::InputMouseY(float value)
 }
 
 void ATpsPlayer::InputJump()
+{
+	//Jump();
+}
+
+void ATpsPlayer::EnhancedJump()
 {
 	Jump();
 }
