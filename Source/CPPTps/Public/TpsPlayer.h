@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
+
 #include "TpsPlayer.generated.h"
 
 UCLASS()
@@ -50,9 +51,17 @@ public:
 	UPROPERTY(EditAnywhere)
 	class UInputAction* ia_Jump;
 
+	// InputAction Mouse
+	UPROPERTY(EditAnywhere)
+	class UInputAction* ia_MouseMove;
+
+	// InputAction Move (W, A, S, D)
+	UPROPERTY(EditAnywhere)
+	class UInputAction* ia_Move;
+
 public:
 
-	void MoveAction();
+	void MoveAction(FVector2d keyboardInput);
 	void RotateAction();
 
 	void InputHorizontal(float value);
@@ -62,6 +71,7 @@ public:
 
 	void InputJump();
 	void EnhancedJump();
-
+	void EnhancedMouse(const struct FInputActionValue& value);
+	void EnhancedMove(const struct FInputActionValue& value);
 };
 

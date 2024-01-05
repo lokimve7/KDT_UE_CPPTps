@@ -95,7 +95,7 @@ void ATpsPlayer::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 		
-	MoveAction();
+	// MoveAction();
 
 	// RotateAction();	
 }
@@ -109,6 +109,10 @@ void ATpsPlayer::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent
 	if (input)
 	{
 		input->BindAction(ia_Jump, ETriggerEvent::Started, this, &ATpsPlayer::EnhancedJump);
+
+		input->BindAction(ia_MouseMove, ETriggerEvent::Triggered, this, &ATpsPlayer::EnhancedMouse);		
+
+		input->BindAction(ia_Move, ETriggerEvent::Triggered, this, &ATpsPlayer::EnhancedMove);
 	}
 
 	
@@ -127,7 +131,7 @@ void ATpsPlayer::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent
 	PlayerInputComponent->BindAction(TEXT("Jump"), IE_Pressed, this, &ATpsPlayer::InputJump);
 }
 
-void ATpsPlayer::MoveAction()
+void ATpsPlayer::MoveAction(FVector2d keyboardInput)
 {
 	//// p = p0 + vt
 	//FVector p0 = GetActorLocation();
@@ -141,8 +145,8 @@ void ATpsPlayer::MoveAction()
 	//FVector p = p0 + vt;
 	//SetActorLocation(p);
 
-	FVector dir = GetActorRightVector() * moveInput.Y +
-		GetActorForwardVector() * moveInput.X;
+	FVector dir = GetActorRightVector() * keyboardInput.X +
+		GetActorForwardVector() * keyboardInput.Y;
 	// dir 의 크기를 1로 만든다.
 	dir.Normalize();
 
@@ -170,7 +174,7 @@ void ATpsPlayer::InputVertical(float value)
 
 void ATpsPlayer::InputMouseX(float value)
 {
-	AddControllerYawInput(value);
+	//AddControllerYawInput(value);
 
 	// 좌, 우 회전하는 값을 누적
 	//mx += value;
@@ -179,7 +183,7 @@ void ATpsPlayer::InputMouseX(float value)
 
 void ATpsPlayer::InputMouseY(float value)
 {
-	AddControllerPitchInput(value);
+	//AddControllerPitchInput(value);
 	// 상, 하 회전하는 값을 누적
 	//my += value;
 }
@@ -192,5 +196,20 @@ void ATpsPlayer::InputJump()
 void ATpsPlayer::EnhancedJump()
 {
 	Jump();
+}
+
+void ATpsPlayer::EnhancedMouse(const FInputActionValue& value)
+{
+	FVector2d mouseValue = value.Get<FVector2d>();
+
+	AddControllerYawInput(mouseValue.X);
+	AddControllerPitchInput(mouseValue.Y);
+}
+
+void ATpsPlayer::EnhancedMove(const FInputActionValue& value)
+{
+	FVector2d keyboardValue = value.Get<FVector2d>();
+
+	MoveAction(keyboardValue);
 }
 
