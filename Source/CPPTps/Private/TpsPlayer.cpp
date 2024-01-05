@@ -110,25 +110,10 @@ void ATpsPlayer::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent
 	{
 		input->BindAction(ia_Jump, ETriggerEvent::Started, this, &ATpsPlayer::EnhancedJump);
 
-		input->BindAction(ia_MouseMove, ETriggerEvent::Triggered, this, &ATpsPlayer::EnhancedMouse);		
+		input->BindAction(ia_MouseMove, ETriggerEvent::Triggered, this, &ATpsPlayer::EnhancedMouse);
 
 		input->BindAction(ia_Move, ETriggerEvent::Triggered, this, &ATpsPlayer::EnhancedMove);
 	}
-
-	
-	// A, D
-	PlayerInputComponent->BindAxis(TEXT("Horizontal"), this, &ATpsPlayer::InputHorizontal);
-
-	// W, S
-	PlayerInputComponent->BindAxis(TEXT("Vertical"), this, &ATpsPlayer::InputVertical);
-
-	// 마우스 좌우 움직일 때 
-	PlayerInputComponent->BindAxis(TEXT("MouseX"), this, &ATpsPlayer::InputMouseX);
-	// 마우스 상하 움직일 때
-	PlayerInputComponent->BindAxis(TEXT("MouseY"), this, &ATpsPlayer::InputMouseY);
-
-	// 스페이스바 눌렀을 때 
-	PlayerInputComponent->BindAction(TEXT("Jump"), IE_Pressed, this, &ATpsPlayer::InputJump);
 }
 
 void ATpsPlayer::MoveAction(FVector2d keyboardInput)
@@ -160,37 +145,6 @@ void ATpsPlayer::RotateAction()
 	SetActorRotation(FRotator(0, mx, 0));
 	// spring arm 의 회전 pitch (y축) 값 셋팅
 	arm->SetRelativeRotation(FRotator(my, 0, 0));
-}
-
-void ATpsPlayer::InputHorizontal(float value)
-{
-	moveInput.Y = value;
-}
-
-void ATpsPlayer::InputVertical(float value)
-{
-	moveInput.X = value;
-}
-
-void ATpsPlayer::InputMouseX(float value)
-{
-	//AddControllerYawInput(value);
-
-	// 좌, 우 회전하는 값을 누적
-	//mx += value;
-
-}
-
-void ATpsPlayer::InputMouseY(float value)
-{
-	//AddControllerPitchInput(value);
-	// 상, 하 회전하는 값을 누적
-	//my += value;
-}
-
-void ATpsPlayer::InputJump()
-{
-	//Jump();
 }
 
 void ATpsPlayer::EnhancedJump()

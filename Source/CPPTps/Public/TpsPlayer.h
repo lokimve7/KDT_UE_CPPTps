@@ -34,9 +34,6 @@ public:
 	UPROPERTY(EditAnywhere)
 	class UCameraComponent* cam;
 
-	// float h;, float v;
-	FVector moveInput = FVector(0);
-
 	float moveSpeed = 500;
 
 	// È¸Àü °ª
@@ -64,12 +61,6 @@ public:
 	void MoveAction(FVector2d keyboardInput);
 	void RotateAction();
 
-	void InputHorizontal(float value);
-	void InputVertical(float value);
-	void InputMouseX(float value);
-	void InputMouseY(float value);
-
-	void InputJump();
 	void EnhancedJump();
 	void EnhancedMouse(const struct FInputActionValue& value);
 	void EnhancedMove(const struct FInputActionValue& value);
