@@ -71,6 +71,21 @@ ATpsPlayer::ATpsPlayer()
 	cam = CreateDefaultSubobject<UCameraComponent>(TEXT("CAM"));
 	// cam 을 arm 의 자식으로 셋팅
 	cam->SetupAttachment(arm);
+
+	// gun 컴포넌트 생성
+	gun = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("GUN"));
+	gun->SetupAttachment(RootComponent);
+	gun->SetRelativeLocation(FVector(45, 35, 45));
+	//(Pitch = 0.000000, Yaw = -90.000000, Roll = 0.000000)
+	//pitch yaw roll
+	gun->SetRelativeRotation(FRotator(0, -90, 0));
+
+	// gun 모양 읽어오자
+	ConstructorHelpers::FObjectFinder<USkeletalMesh> tempGun(TEXT("/Script/Engine.SkeletalMesh'/Game/Resources/FPWeapon/Mesh/SK_FPGun.SK_FPGun'"));
+	if (tempGun.Succeeded())
+	{
+		gun->SetSkeletalMesh(tempGun.Object);
+	}
 }
 
 // Called when the game starts or when spawned

@@ -34,6 +34,9 @@ public:
 	UPROPERTY(EditAnywhere)
 	class UCameraComponent* cam;
 
+	UPROPERTY(EditAnywhere)
+	class USkeletalMeshComponent* gun;
+
 	float moveSpeed = 500;
 
 	// È¸Àü °ª
