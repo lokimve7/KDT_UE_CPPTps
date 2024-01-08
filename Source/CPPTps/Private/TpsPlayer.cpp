@@ -10,6 +10,7 @@
 #include <InputAction.h>
 #include <EnhancedInputSubsystems.h>
 #include <EnhancedInputComponent.h>
+#include "Bullet.h"
 
 // Sets default values
 ATpsPlayer::ATpsPlayer()
@@ -29,6 +30,20 @@ ATpsPlayer::ATpsPlayer()
 	if (tempIAJump.Succeeded())
 	{
 		ia_Jump = tempIAJump.Object;
+	}
+
+	// ia_Fire 파일 읽어오자
+	ConstructorHelpers::FObjectFinder<UInputAction> tempIAFire(TEXT("/Script/EnhancedInput.InputAction'/Game/Input/IA_Fire.IA_Fire'"));
+	if (tempIAFire.Succeeded())
+	{
+		ia_Fire = tempIAFire.Object;
+	}
+
+	// Bullet 블루프린트 가져오자
+	ConstructorHelpers::FClassFinder<ABullet> tempBullet(TEXT("/Script/Engine.Blueprint'/Game/Blueprints/BP_Bullet.BP_Bullet_C'"));
+	if (tempBullet.Succeeded())
+	{
+		bulletFactory = tempBullet.Class;
 	}
 
 	// Skeletal Mesh 읽어오자
@@ -88,6 +103,9 @@ void ATpsPlayer::BeginPlay()
 	auto subSystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(playerController->GetLocalPlayer());
 	// imcDefault 추가 하자
 	subSystem->AddMappingContext(imcDefault, 0);
+
+
+	
 }
 
 // Called every frame
@@ -113,6 +131,8 @@ void ATpsPlayer::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent
 		input->BindAction(ia_MouseMove, ETriggerEvent::Triggered, this, &ATpsPlayer::EnhancedMouse);
 
 		input->BindAction(ia_Move, ETriggerEvent::Triggered, this, &ATpsPlayer::EnhancedMove);
+
+		input->BindAction(ia_Fire, ETriggerEvent::Started, this, &ATpsPlayer::EnhancedFire);
 	}
 }
 
@@ -165,5 +185,13 @@ void ATpsPlayer::EnhancedMove(const FInputActionValue& value)
 	FVector2d keyboardValue = value.Get<FVector2d>();
 
 	MoveAction(keyboardValue);
+}
+
+void ATpsPlayer::EnhancedFire()
+{
+	// 생성되야하는 위치 계산 (나의 위치 + 나의 앞방향으로 100만큼 떨어진 값)
+	FVector pos = GetActorLocation() + GetActorForwardVector() * 100;
+	// 총알 공장을 이용해서 총알을 만든다. ( with 위치, 회전)
+	GetWorld()->SpawnActor<ABullet>(bulletFactory, pos, GetActorRotation());
 }
 

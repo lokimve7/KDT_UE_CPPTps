@@ -56,6 +56,13 @@ public:
 	UPROPERTY(EditAnywhere)
 	class UInputAction* ia_Move;
 
+	// InputAction Fire 
+	UPROPERTY(EditAnywhere)
+	class UInputAction* ia_Fire;
+
+	// ÃÑ¾Ë Blueprint (ÃÑ¾Ë°øÀå)
+	TSubclassOf<class ABullet> bulletFactory;
+
 public:
 
 	void MoveAction(FVector2d keyboardInput);
@@ -64,5 +71,6 @@ public:
 	void EnhancedJump();
 	void EnhancedMouse(const struct FInputActionValue& value);
 	void EnhancedMove(const struct FInputActionValue& value);
+	void EnhancedFire();
 };
 
