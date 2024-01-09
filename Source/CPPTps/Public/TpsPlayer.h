@@ -63,8 +63,24 @@ public:
 	UPROPERTY(EditAnywhere)
 	class UInputAction* ia_Fire;
 
+	// InputAction Zoom
+	UPROPERTY(EditAnywhere)
+	class UInputAction* ia_Zoom;
+
 	// 총알 Blueprint (총알공장)
+	UPROPERTY(EditAnywhere)
 	TSubclassOf<class ABullet> bulletFactory;
+
+	// 파티클 효과 ( LineTrace 에 부딪힌 곳에 보여주자)
+	UPROPERTY(EditAnywhere)
+	class UParticleSystem* impactEffect;
+
+	// Sniper Widget 블루프린트 담을 변수
+	UPROPERTY(EditAnywhere)
+	TSubclassOf<class USniperWidget> sniperWidget;
+	// Sniper Widget 을 통해 만든 UI 를 담을 변수
+	UPROPERTY(EditAnywhere)
+	class USniperWidget* sniperUI;
 
 public:
 
@@ -74,6 +90,7 @@ public:
 	void EnhancedJump();
 	void EnhancedMouse(const struct FInputActionValue& value);
 	void EnhancedMove(const struct FInputActionValue& value);
-	void EnhancedFire();
+	void EnhancedFire(const struct FInputActionValue& value);
+	void EnhancedZoom(const struct FInputActionValue& value);
 };
 
