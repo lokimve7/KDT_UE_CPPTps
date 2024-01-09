@@ -81,7 +81,7 @@ ATpsPlayer::ATpsPlayer()
 	gun->SetRelativeRotation(FRotator(0, -90, 0));
 
 	// gun 모양 읽어오자
-	ConstructorHelpers::FObjectFinder<USkeletalMesh> tempGun(TEXT("/Script/Engine.SkeletalMesh'/Game/Resources/FPWeapon/Mesh/SK_FPGun.SK_FPGun'"));
+	ConstructorHelpers::FObjectFinder<USkeletalMesh> tempGun(TEXT("/Script/Engine.SkeletalMesh'/Game/MilitaryWeapSilver/Weapons/Assault_Rifle_A.Assault_Rifle_A'"));
 	if (tempGun.Succeeded())
 	{
 		gun->SetSkeletalMesh(tempGun.Object);
@@ -118,9 +118,6 @@ void ATpsPlayer::BeginPlay()
 	auto subSystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(playerController->GetLocalPlayer());
 	// imcDefault 추가 하자
 	subSystem->AddMappingContext(imcDefault, 0);
-
-
-	
 }
 
 // Called every frame
@@ -205,8 +202,10 @@ void ATpsPlayer::EnhancedMove(const FInputActionValue& value)
 void ATpsPlayer::EnhancedFire()
 {
 	// 생성되야하는 위치 계산 (나의 위치 + 나의 앞방향으로 100만큼 떨어진 값)
-	FVector pos = GetActorLocation() + GetActorForwardVector() * 100;
+	//FVector pos = GetActorLocation() + GetActorForwardVector() * 100;
+	FVector pos = gun->GetSocketLocation(TEXT("FirePos"));
+	FRotator rot = gun->GetSocketRotation(TEXT("FirePos"));
 	// 총알 공장을 이용해서 총알을 만든다. ( with 위치, 회전)
-	GetWorld()->SpawnActor<ABullet>(bulletFactory, pos, GetActorRotation());
+	GetWorld()->SpawnActor<ABullet>(bulletFactory, pos, rot);
 }
 
