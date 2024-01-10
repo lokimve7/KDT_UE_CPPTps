@@ -42,6 +42,9 @@ public:
 
 	float moveSpeed = 500;
 
+	// 선택한 무기 
+	int32 currWeaponMode = 1;
+
 	// 회전 값
 	float mx = 0;
 	float my = 0;
@@ -70,6 +73,10 @@ public:
 	UPROPERTY(EditAnywhere)
 	class UInputAction* ia_Zoom;
 
+	// InputAction RealFire
+	UPROPERTY(EditAnywhere)
+	class UInputAction* ia_RealFire;
+
 	// 총알 Blueprint (총알공장)
 	UPROPERTY(EditAnywhere)
 	TSubclassOf<class ABullet> bulletFactory;
@@ -90,11 +97,13 @@ public:
 	void MoveAction(FVector2d keyboardInput);
 	void RotateAction();
 	void ChangeWeapon(int32 weaponIdx);
+	void ZoomInOut(bool isPressed);
 
 	void EnhancedJump();
 	void EnhancedMouse(const struct FInputActionValue& value);
 	void EnhancedMove(const struct FInputActionValue& value);
 	void EnhancedFire(const struct FInputActionValue& value);
 	void EnhancedZoom(const struct FInputActionValue& value);
+	void EnhancedRealFire();
 };
 

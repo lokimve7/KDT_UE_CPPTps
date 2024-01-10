@@ -154,10 +154,11 @@ void ATpsPlayer::BeginPlay()
 	// imcDefault 추가 하자
 	subSystem->AddMappingContext(imcDefault, 0);
 
-
 	// sniper widget 생성
 	sniperUI = CreateWidget<USniperWidget>(GetWorld(), sniperWidget);
 
+	// currWeaponMode 의 값에 따라서 무기를 선택하자
+	ChangeWeapon(currWeaponMode);
  }
 
 // Called every frame
@@ -188,6 +189,7 @@ void ATpsPlayer::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent
 
 		input->BindAction(ia_Zoom, ETriggerEvent::Triggered, this, &ATpsPlayer::EnhancedZoom);
 
+		input->BindAction(ia_RealFire, ETriggerEvent::Triggered, this, &ATpsPlayer::EnhancedRealFire);
 	}
 }
 
@@ -224,6 +226,9 @@ void ATpsPlayer::RotateAction()
 
 void ATpsPlayer::ChangeWeapon(int32 weaponIdx)
 {
+	// 나의 현재 무기는 weaponIdx 다!! 설정
+	currWeaponMode = weaponIdx;
+
 	switch (weaponIdx)
 	{
 	// 만약에 weaponIdx 가 1이면 
@@ -231,6 +236,12 @@ void ATpsPlayer::ChangeWeapon(int32 weaponIdx)
 		// Gun 을 보이게 하고, Sniper 를 보이지 않게
 		gun->SetVisibility(true);
 		sniper->SetVisibility(false);
+		// 만약에 Sniper UI 가 화면에 있다면
+		if (sniperUI->IsInViewport())
+		{
+			// 제거해라 / 화면 축소
+			ZoomInOut(false);
+		}
 		break;
 	// 만약에 weaponIdx 가 2이면 
 	case 2:
@@ -241,6 +252,26 @@ void ATpsPlayer::ChangeWeapon(int32 weaponIdx)
 	default:
 		break;
 	}	
+}
+
+void ATpsPlayer::ZoomInOut(bool isPressed)
+{
+	// 1. 만약에 value 의 값이 true (마우스 오른쪽 버튼을 눌렀다면)
+	if (isPressed)
+	{
+		// 2. Sniper UI 을 화면에 붙이자.
+		sniperUI->AddToViewport();
+		// 화면 확대
+		cam->SetFieldOfView(45);
+	}
+	// 3. 그렇지 않고 value 의 값이 false (마우스 왼쪽 버튼을 떼었다면)
+	else
+	{
+		// 4. Sniper UI 을 화면에에서 지우자
+		sniperUI->RemoveFromParent();
+		// 화면 축소
+		cam->SetFieldOfView(90);
+	}
 }
 
 void ATpsPlayer::EnhancedJump()
@@ -267,82 +298,79 @@ void ATpsPlayer::EnhancedFire(const FInputActionValue& value)
 {
 	int32 actionValue = value.Get<float>();
 
-	ChangeWeapon(actionValue);
-
-	//switch (actionValue)
-	//{
-	//	case 1:
-	//	{
-	//		// 생성되야하는 위치 계산 (나의 위치 + 나의 앞방향으로 100만큼 떨어진 값)
-	//		//FVector pos = GetActorLocation() + GetActorForwardVector() * 100;
-	//		FVector pos = gun->GetSocketLocation(TEXT("FirePos"));
-	//		FRotator rot = gun->GetSocketRotation(TEXT("FirePos"));
-	//		// 총알 공장을 이용해서 총알을 만든다. ( with 위치, 회전)
-	//		GetWorld()->SpawnActor<ABullet>(bulletFactory, pos, rot);
-	//	}
-	//	break;
-
-	//	case 2:
-	//	{
-	//		// LineTrace 시작 지점
-	//		FVector start = cam->GetComponentLocation();
-	//		// LineTrace 끝 지점
-	//		FVector end = start + cam->GetForwardVector() * 5000;
-	//		// 어딘가 부딪혔을 때 부딪힌 Actor 정보를 담을 변수 
-	//		FHitResult hitInfo;
-	//		// 충돌 옵션 설정
-	//		FCollisionQueryParams param;
-	//		param.AddIgnoredActor(this);
-
-	//		// 책에 나와있는 내용(UKismetSystemLibrary::LineTraceSingle 안에 구현 되어있는 방법)
-	//		bool isHit = GetWorld()->LineTraceSingleByChannel(hitInfo, start, end, ECC_Visibility, param);
-
-
-	//		// 블루 프린트에 사용하는 노드
-	//		/*TArray<AActor*> ignoreActor;			
-	//		bool isHit = UKismetSystemLibrary::LineTraceSingle(
-	//			GetWorld(), 
-	//			start, 
-	//			end, 
-	//			UEngineTypes::ConvertToTraceType(ECC_Visibility), 
-	//			false, 
-	//			ignoreActor, 
-	//			EDrawDebugTrace::None, 
-	//			hitInfo, 
-	//			true);*/
-
-	//		// 만약에 LineTrace 가 어딘가에 부딪혔다면
-	//		if (isHit)
-	//		{
-	//			// 효과의 회전값을 부딪힌 곳의 수직벡터(NormalVector) 를 이용해서 계산하자
-	//			FRotator rot = UKismetMathLibrary::MakeRotFromX(hitInfo.ImpactNormal);
-
-	//			// impact 효과를 보여주자
-	//			UGameplayStatics::SpawnEmitterAtLocation(
-	//				GetWorld(), 
-	//				impactEffect, 
-	//				hitInfo.ImpactPoint,
-	//				rot);
-	//		}
-	//	}
-	//	break;
-	//}
+	ChangeWeapon(actionValue);	
 }
 
 void ATpsPlayer::EnhancedZoom(const struct FInputActionValue& value)
 {
+	// 만약에 너의 현재 무기가 sniper 가 아니라면
+	// 함수를 나가라
+	if (currWeaponMode != 2) return;
+
 	bool isPressed = value.Get<bool>();
-	// 1. 만약에 value 의 값이 true (마우스 오른쪽 버튼을 눌렀다면)
-	if (isPressed)
+	
+	ZoomInOut(isPressed);
+}
+
+void ATpsPlayer::EnhancedRealFire()
+{
+	switch (currWeaponMode)
 	{
-		// 2. Sniper UI 을 화면에 붙이자.
-		sniperUI->AddToViewport();
-	}
-	// 3. 그렇지 않고 value 의 값이 false (마우스 왼쪽 버튼을 떼었다면)
-	else
-	{
-		// 4. Sniper UI 을 화면에에서 지우자
-		sniperUI->RemoveFromParent();
+		case 1:
+		{
+			// 생성되야하는 위치 계산 (나의 위치 + 나의 앞방향으로 100만큼 떨어진 값)
+			//FVector pos = GetActorLocation() + GetActorForwardVector() * 100;
+			FVector pos = gun->GetSocketLocation(TEXT("FirePos"));
+			FRotator rot = gun->GetSocketRotation(TEXT("FirePos"));
+			// 총알 공장을 이용해서 총알을 만든다. ( with 위치, 회전)
+			GetWorld()->SpawnActor<ABullet>(bulletFactory, pos, rot);
+		}
+		break;
+
+		case 2:
+		{
+			// LineTrace 시작 지점
+			FVector start = cam->GetComponentLocation();
+			// LineTrace 끝 지점
+			FVector end = start + cam->GetForwardVector() * 5000;
+			// 어딘가 부딪혔을 때 부딪힌 Actor 정보를 담을 변수 
+			FHitResult hitInfo;
+			// 충돌 옵션 설정
+			FCollisionQueryParams param;
+			param.AddIgnoredActor(this);
+
+			// 책에 나와있는 내용(UKismetSystemLibrary::LineTraceSingle 안에 구현 되어있는 방법)
+			bool isHit = GetWorld()->LineTraceSingleByChannel(hitInfo, start, end, ECC_Visibility, param);
+
+
+			// 블루 프린트에 사용하는 노드
+			/*TArray<AActor*> ignoreActor;			
+			bool isHit = UKismetSystemLibrary::LineTraceSingle(
+				GetWorld(), 
+				start, 
+				end, 
+				UEngineTypes::ConvertToTraceType(ECC_Visibility), 
+				false, 
+				ignoreActor, 
+				EDrawDebugTrace::None, 
+				hitInfo, 
+				true);*/
+
+			// 만약에 LineTrace 가 어딘가에 부딪혔다면
+			if (isHit)
+			{
+				// 효과의 회전값을 부딪힌 곳의 수직벡터(NormalVector) 를 이용해서 계산하자
+				FRotator rot = UKismetMathLibrary::MakeRotFromX(hitInfo.ImpactNormal);
+
+				// impact 효과를 보여주자
+				UGameplayStatics::SpawnEmitterAtLocation(
+					GetWorld(), 
+					impactEffect, 
+					hitInfo.ImpactPoint,
+					rot);
+			}
+		}
+		break;
 	}
 }
 
