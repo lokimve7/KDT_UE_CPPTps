@@ -37,6 +37,9 @@ public:
 	UPROPERTY(EditAnywhere)
 	class USkeletalMeshComponent* gun;
 
+	UPROPERTY(EditAnywhere)
+	class USkeletalMeshComponent* sniper;
+
 	float moveSpeed = 500;
 
 	// È¸Àü °ª
@@ -86,6 +89,7 @@ public:
 
 	void MoveAction(FVector2d keyboardInput);
 	void RotateAction();
+	void ChangeWeapon(int32 weaponIdx);
 
 	void EnhancedJump();
 	void EnhancedMouse(const struct FInputActionValue& value);

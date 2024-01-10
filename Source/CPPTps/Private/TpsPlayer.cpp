@@ -103,6 +103,18 @@ ATpsPlayer::ATpsPlayer()
 		gun->SetSkeletalMesh(tempGun.Object);
 	}
 
+	// sniper 컴포넌트 생성
+	sniper = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("SNIPER"));
+	sniper->SetupAttachment(RootComponent);
+	sniper->SetRelativeLocation(FVector(45, 64, 45));
+	sniper->SetRelativeRotation(FRotator(0, -90, 0));
+	// sniper 모양 읽어오자
+	ConstructorHelpers::FObjectFinder<USkeletalMesh> tempSniper(TEXT("/Script/Engine.SkeletalMesh'/Game/MilitaryWeapSilver/Weapons/Sniper_Rifle_A.Sniper_Rifle_A'"));
+	if (tempSniper.Succeeded())
+	{
+		sniper->SetSkeletalMesh(tempSniper.Object);
+	}
+
 	// Sniper Widget 블루프린트 가져오자
 	ConstructorHelpers::FClassFinder<USniperWidget> tempSniperWidget(TEXT("/Script/UMGEditor.WidgetBlueprint'/Game/Blueprints/BP_SniperWidget.BP_SniperWidget_C'"));
 	if (tempSniperWidget.Succeeded())
@@ -145,7 +157,8 @@ void ATpsPlayer::BeginPlay()
 
 	// sniper widget 생성
 	sniperUI = CreateWidget<USniperWidget>(GetWorld(), sniperWidget);
-}
+
+ }
 
 // Called every frame
 void ATpsPlayer::Tick(float DeltaTime)
@@ -209,6 +222,27 @@ void ATpsPlayer::RotateAction()
 	arm->SetRelativeRotation(FRotator(my, 0, 0));
 }
 
+void ATpsPlayer::ChangeWeapon(int32 weaponIdx)
+{
+	switch (weaponIdx)
+	{
+	// 만약에 weaponIdx 가 1이면 
+	case 1:
+		// Gun 을 보이게 하고, Sniper 를 보이지 않게
+		gun->SetVisibility(true);
+		sniper->SetVisibility(false);
+		break;
+	// 만약에 weaponIdx 가 2이면 
+	case 2:
+		// Gun 을 보이지 않게 하고, Sniper 를 보이게
+		gun->SetVisibility(false);
+		sniper->SetVisibility(true);
+		break;
+	default:
+		break;
+	}	
+}
+
 void ATpsPlayer::EnhancedJump()
 {
 	Jump();
@@ -233,64 +267,66 @@ void ATpsPlayer::EnhancedFire(const FInputActionValue& value)
 {
 	int32 actionValue = value.Get<float>();
 
-	switch (actionValue)
-	{
-		case 1:
-		{
-			// 생성되야하는 위치 계산 (나의 위치 + 나의 앞방향으로 100만큼 떨어진 값)
-			//FVector pos = GetActorLocation() + GetActorForwardVector() * 100;
-			FVector pos = gun->GetSocketLocation(TEXT("FirePos"));
-			FRotator rot = gun->GetSocketRotation(TEXT("FirePos"));
-			// 총알 공장을 이용해서 총알을 만든다. ( with 위치, 회전)
-			GetWorld()->SpawnActor<ABullet>(bulletFactory, pos, rot);
-		}
-		break;
+	ChangeWeapon(actionValue);
 
-		case 2:
-		{
-			// LineTrace 시작 지점
-			FVector start = cam->GetComponentLocation();
-			// LineTrace 끝 지점
-			FVector end = start + cam->GetForwardVector() * 5000;
-			// 어딘가 부딪혔을 때 부딪힌 Actor 정보를 담을 변수 
-			FHitResult hitInfo;
-			// 충돌 옵션 설정
-			FCollisionQueryParams param;
-			param.AddIgnoredActor(this);
+	//switch (actionValue)
+	//{
+	//	case 1:
+	//	{
+	//		// 생성되야하는 위치 계산 (나의 위치 + 나의 앞방향으로 100만큼 떨어진 값)
+	//		//FVector pos = GetActorLocation() + GetActorForwardVector() * 100;
+	//		FVector pos = gun->GetSocketLocation(TEXT("FirePos"));
+	//		FRotator rot = gun->GetSocketRotation(TEXT("FirePos"));
+	//		// 총알 공장을 이용해서 총알을 만든다. ( with 위치, 회전)
+	//		GetWorld()->SpawnActor<ABullet>(bulletFactory, pos, rot);
+	//	}
+	//	break;
 
-			// 책에 나와있는 내용(UKismetSystemLibrary::LineTraceSingle 안에 구현 되어있는 방법)
-			bool isHit = GetWorld()->LineTraceSingleByChannel(hitInfo, start, end, ECC_Visibility, param);
+	//	case 2:
+	//	{
+	//		// LineTrace 시작 지점
+	//		FVector start = cam->GetComponentLocation();
+	//		// LineTrace 끝 지점
+	//		FVector end = start + cam->GetForwardVector() * 5000;
+	//		// 어딘가 부딪혔을 때 부딪힌 Actor 정보를 담을 변수 
+	//		FHitResult hitInfo;
+	//		// 충돌 옵션 설정
+	//		FCollisionQueryParams param;
+	//		param.AddIgnoredActor(this);
+
+	//		// 책에 나와있는 내용(UKismetSystemLibrary::LineTraceSingle 안에 구현 되어있는 방법)
+	//		bool isHit = GetWorld()->LineTraceSingleByChannel(hitInfo, start, end, ECC_Visibility, param);
 
 
-			// 블루 프린트에 사용하는 노드
-			/*TArray<AActor*> ignoreActor;			
-			bool isHit = UKismetSystemLibrary::LineTraceSingle(
-				GetWorld(), 
-				start, 
-				end, 
-				UEngineTypes::ConvertToTraceType(ECC_Visibility), 
-				false, 
-				ignoreActor, 
-				EDrawDebugTrace::None, 
-				hitInfo, 
-				true);*/
+	//		// 블루 프린트에 사용하는 노드
+	//		/*TArray<AActor*> ignoreActor;			
+	//		bool isHit = UKismetSystemLibrary::LineTraceSingle(
+	//			GetWorld(), 
+	//			start, 
+	//			end, 
+	//			UEngineTypes::ConvertToTraceType(ECC_Visibility), 
+	//			false, 
+	//			ignoreActor, 
+	//			EDrawDebugTrace::None, 
+	//			hitInfo, 
+	//			true);*/
 
-			// 만약에 LineTrace 가 어딘가에 부딪혔다면
-			if (isHit)
-			{
-				// 효과의 회전값을 부딪힌 곳의 수직벡터(NormalVector) 를 이용해서 계산하자
-				FRotator rot = UKismetMathLibrary::MakeRotFromX(hitInfo.ImpactNormal);
+	//		// 만약에 LineTrace 가 어딘가에 부딪혔다면
+	//		if (isHit)
+	//		{
+	//			// 효과의 회전값을 부딪힌 곳의 수직벡터(NormalVector) 를 이용해서 계산하자
+	//			FRotator rot = UKismetMathLibrary::MakeRotFromX(hitInfo.ImpactNormal);
 
-				// impact 효과를 보여주자
-				UGameplayStatics::SpawnEmitterAtLocation(
-					GetWorld(), 
-					impactEffect, 
-					hitInfo.ImpactPoint,
-					rot);
-			}
-		}
-		break;
-	}
+	//			// impact 효과를 보여주자
+	//			UGameplayStatics::SpawnEmitterAtLocation(
+	//				GetWorld(), 
+	//				impactEffect, 
+	//				hitInfo.ImpactPoint,
+	//				rot);
+	//		}
+	//	}
+	//	break;
+	//}
 }
 
 void ATpsPlayer::EnhancedZoom(const struct FInputActionValue& value)
