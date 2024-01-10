@@ -42,7 +42,7 @@ public:
 
 	float moveSpeed = 500;
 
-	// 선택한 무기 
+	// 선택한 무기 (1 : 라이플, 2 : 스나이퍼)
 	int32 currWeaponMode = 1;
 
 	// 회전 값
@@ -105,5 +105,22 @@ public:
 	void EnhancedFire(const struct FInputActionValue& value);
 	void EnhancedZoom(const struct FInputActionValue& value);
 	void EnhancedRealFire();
+
+
+
+
+
+
+
+
+//---------------------------------------------------
+public:
+	UPROPERTY(EditAnywhere)
+	class UInventory* compInven;
+	UPROPERTY(EditAnywhere)
+	class UInputAction* ia_GetItem;
+
+public:
+	void InputGetItem(const struct FInputActionValue& value);
 };
 

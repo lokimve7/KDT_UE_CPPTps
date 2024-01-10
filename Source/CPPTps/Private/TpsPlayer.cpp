@@ -14,6 +14,8 @@
 #include <Kismet/KismetMathLibrary.h>
 #include <Particles/ParticleSystem.h>
 #include "SniperWidget.h"
+#include "Inventory.h"
+#include "TpsGameInstance.h"
 
 // Sets default values
 ATpsPlayer::ATpsPlayer()
@@ -121,6 +123,14 @@ ATpsPlayer::ATpsPlayer()
 	{
 		sniperWidget = tempSniperWidget.Class;
 	}
+
+
+
+
+
+
+//-------------------------------------------
+	compInven = CreateDefaultSubobject<UInventory>(TEXT("INVEN"));
 }
 
 // Called when the game starts or when spawned
@@ -190,6 +200,8 @@ void ATpsPlayer::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent
 		input->BindAction(ia_Zoom, ETriggerEvent::Triggered, this, &ATpsPlayer::EnhancedZoom);
 
 		input->BindAction(ia_RealFire, ETriggerEvent::Triggered, this, &ATpsPlayer::EnhancedRealFire);
+
+		input->BindAction(ia_GetItem, ETriggerEvent::Triggered, this, &ATpsPlayer::InputGetItem);
 	}
 }
 
@@ -372,5 +384,14 @@ void ATpsPlayer::EnhancedRealFire()
 		}
 		break;
 	}
+}
+
+void ATpsPlayer::InputGetItem(const struct FInputActionValue& value)
+{
+	int32 actionValue = value.Get<float>() ;
+	actionValue--;
+	//actionValue 해당 되는 아이템을 추가( compInven->myItems 에)
+	UTpsGameInstance* gameInstance = Cast<UTpsGameInstance>(UGameplayStatics::GetGameInstance(GetWorld()));
+	compInven->myItems.Add(gameInstance->defineItem[actionValue]);
 }
 
