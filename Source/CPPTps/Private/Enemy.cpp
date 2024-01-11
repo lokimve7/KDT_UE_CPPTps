@@ -4,6 +4,7 @@
 #include "Enemy.h"
 
 #include "EnemyFSM.h"
+#include <GameFramework/CharacterMovementComponent.h>
 
 // Sets default values
 AEnemy::AEnemy()
@@ -24,6 +25,9 @@ AEnemy::AEnemy()
 
 	// FSM 컴포넌트 추가
 	fsm = CreateDefaultSubobject<UEnemyFSM>(TEXT("FSM"));
+
+	// 이동 방향으로 나를 회전 시켜줘 옵션 활성화
+	GetCharacterMovement()->bOrientRotationToMovement = true;
 }
 
 // Called when the game starts or when spawned

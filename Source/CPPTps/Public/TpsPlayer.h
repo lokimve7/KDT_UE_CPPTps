@@ -7,6 +7,14 @@
 
 #include "TpsPlayer.generated.h"
 
+UENUM(BlueprintType)
+enum class EWeaponType : uint8
+{
+	NONE = 0,
+	GUN = 1,
+	SNIPER
+};
+
 UCLASS()
 class CPPTPS_API ATpsPlayer : public ACharacter
 {
@@ -43,7 +51,7 @@ public:
 	float moveSpeed = 500;
 
 	// 선택한 무기 (1 : 라이플, 2 : 스나이퍼)
-	int32 currWeaponMode = 1;
+	EWeaponType currWeaponMode = EWeaponType::GUN;
 
 	// 회전 값
 	float mx = 0;
@@ -96,7 +104,7 @@ public:
 
 	void MoveAction(FVector2d keyboardInput);
 	void RotateAction();
-	void ChangeWeapon(int32 weaponIdx);
+	void ChangeWeapon(EWeaponType weaponIdx);
 	void ZoomInOut(bool isPressed);
 
 	void EnhancedJump();

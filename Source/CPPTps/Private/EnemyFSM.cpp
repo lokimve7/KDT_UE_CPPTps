@@ -2,6 +2,9 @@
 
 
 #include "EnemyFSM.h"
+#include <Kismet/GameplayStatics.h>
+#include "TpsPlayer.h"
+#include "Enemy.h"
 
 // Sets default values for this component's properties
 UEnemyFSM::UEnemyFSM()
@@ -9,7 +12,7 @@ UEnemyFSM::UEnemyFSM()
 	// Set this component to be initialized when the game starts, and to be ticked every frame.  You can turn these features
 	// off to improve performance if you don't need them.
 	PrimaryComponentTick.bCanEverTick = true;
-
+	
 	// ...
 }
 
@@ -19,7 +22,13 @@ void UEnemyFSM::BeginPlay()
 {
 	Super::BeginPlay();
 
-	// ...
+	// 플레이어를 찾자
+	AActor* findActor = UGameplayStatics::GetActorOfClass(GetWorld(), ATpsPlayer::StaticClass());
+	target = Cast<ATpsPlayer>(findActor);
+	
+	// 나의 액터를 찾자
+	myActor = Cast<AEnemy>(GetOwner());
+
 	
 }
 
@@ -29,6 +38,110 @@ void UEnemyFSM::TickComponent(float DeltaTime, ELevelTick TickType, FActorCompon
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 
-	// ...
+	// 만약에 Target 이 없다면 함수를 나가자
+	if (target == nullptr) return;
+
+	switch (currState)
+	{
+	case EEnemyState::IDLE:
+		UpdateIdle();
+		break;
+	case EEnemyState::MOVE:
+		UpdateMove();
+		break;
+	case EEnemyState::ATTACK:
+		UpdateAttack();
+		break;
+	default:
+		break;
+	}
+	
+}
+
+void UEnemyFSM::ChangeState(EEnemyState s)
+{
+	// 현재 상태를 갱신
+	currState = s;
+
+	switch (currState)
+	{
+	case EEnemyState::IDLE:
+
+		break;
+	case EEnemyState::MOVE:
+
+		break;
+	case EEnemyState::ATTACK:
+		// 바로 공격 가능하게 현재시간을 attackDelayTime 으로 설정
+		currTime = attackDelayTime;
+		break;
+	default:
+		break;
+	}
+}
+
+void UEnemyFSM::UpdateIdle()
+{
+	// 1. 플레이어와의 거리를 구하자.
+	FVector dir = target->GetActorLocation() - myActor->GetActorLocation();
+	float dist = dir.Length();
+	// 2. 만약에 거리가 인지범위 보다 작으면 (플레이어를 쫓아갈 수 있는 상태)
+	if (dist < traceRange)
+	{
+		// 3. 현재 상태를 MOVE 로 바꾸자
+		ChangeState(EEnemyState::MOVE);
+	}
+
+	UE_LOG(LogTemp, Warning, TEXT("IDLE"));
+}
+
+void UEnemyFSM::UpdateMove()
+{
+	// 1. 플레이어를 향하는 방향을 구하자
+	FVector dir = target->GetActorLocation() - myActor->GetActorLocation();
+	
+	// 2. 그 방향으로 움직이자. 
+	myActor->AddMovementInput(dir.GetSafeNormal());
+
+	// 3. 플레이어와의 거리가 공격 범위보다 작으면
+	float dist = dir.Length();
+	if (dist < attackRange)
+	{
+		// 4. 현재 상태를 ATTACK 로 바꾸자
+		ChangeState(EEnemyState::ATTACK);	
+	}	
+
+	UE_LOG(LogTemp, Warning, TEXT("MOVE"));
+}
+
+void UEnemyFSM::UpdateAttack()
+{
+	// 1. 시간을 흐르게 한다.
+	currTime += GetWorld()->DeltaTimeSeconds;
+	// 2. 만약에 Attack Delay 시간이 지나면
+	if (currTime > attackDelayTime)
+	{
+		// 플레어와의 거리
+		float dist = FVector::Distance(target->GetActorLocation(), myActor->GetActorLocation());
+		// 그 거리가 공격범위- > 진짜 공격
+		if (dist < attackRange)
+		{
+			// 3. 진짜 공격!!
+			UE_LOG(LogTemp, Warning, TEXT("ATTACK"));
+		}
+		// 인지범위 -> 이동 
+		else if (dist < traceRange)
+		{
+			ChangeState(EEnemyState::MOVE);
+		}
+		// 그 외는 -> 대기
+		else
+		{
+			ChangeState(EEnemyState::IDLE);
+		}
+		
+		// 4. 현재시간 초기화
+		currTime = 0;
+	}
 }
 

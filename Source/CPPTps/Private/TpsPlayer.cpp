@@ -230,13 +230,13 @@ void ATpsPlayer::MoveAction(FVector2d keyboardInput)
 
 void ATpsPlayer::RotateAction()
 {
-	// 나의 회전 yaw (z축) 값 셋팅
+	// 나의 회전 yaw (z 축) 값 셋팅
 	SetActorRotation(FRotator(0, mx, 0));
-	// spring arm 의 회전 pitch (y축) 값 셋팅
+	// spring arm 의 회전 pitch (y 축) 값 셋팅
 	arm->SetRelativeRotation(FRotator(my, 0, 0));
 }
 
-void ATpsPlayer::ChangeWeapon(int32 weaponIdx)
+void ATpsPlayer::ChangeWeapon(EWeaponType weaponIdx)
 {
 	// 나의 현재 무기는 weaponIdx 다!! 설정
 	currWeaponMode = weaponIdx;
@@ -244,7 +244,7 @@ void ATpsPlayer::ChangeWeapon(int32 weaponIdx)
 	switch (weaponIdx)
 	{
 	// 만약에 weaponIdx 가 1이면 
-	case 1:
+	case EWeaponType::GUN:
 		// Gun 을 보이게 하고, Sniper 를 보이지 않게
 		gun->SetVisibility(true);
 		sniper->SetVisibility(false);
@@ -256,7 +256,7 @@ void ATpsPlayer::ChangeWeapon(int32 weaponIdx)
 		}
 		break;
 	// 만약에 weaponIdx 가 2이면 
-	case 2:
+	case EWeaponType::SNIPER:
 		// Gun 을 보이지 않게 하고, Sniper 를 보이게
 		gun->SetVisibility(false);
 		sniper->SetVisibility(true);
@@ -310,14 +310,16 @@ void ATpsPlayer::EnhancedFire(const FInputActionValue& value)
 {
 	int32 actionValue = value.Get<float>();
 
-	ChangeWeapon(actionValue);	
+	EWeaponType type = (EWeaponType)actionValue;
+
+	ChangeWeapon(type);
 }
 
 void ATpsPlayer::EnhancedZoom(const struct FInputActionValue& value)
 {
 	// 만약에 너의 현재 무기가 sniper 가 아니라면
 	// 함수를 나가라
-	if (currWeaponMode != 2) return;
+	if (currWeaponMode != EWeaponType::SNIPER) return;
 
 	bool isPressed = value.Get<bool>();
 	
@@ -328,7 +330,7 @@ void ATpsPlayer::EnhancedRealFire()
 {
 	switch (currWeaponMode)
 	{
-		case 1:
+		case EWeaponType::GUN:
 		{
 			// 생성되야하는 위치 계산 (나의 위치 + 나의 앞방향으로 100만큼 떨어진 값)
 			//FVector pos = GetActorLocation() + GetActorForwardVector() * 100;
@@ -339,7 +341,7 @@ void ATpsPlayer::EnhancedRealFire()
 		}
 		break;
 
-		case 2:
+		case EWeaponType::SNIPER:
 		{
 			// LineTrace 시작 지점
 			FVector start = cam->GetComponentLocation();
