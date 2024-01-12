@@ -30,4 +30,10 @@ public:
 	UPROPERTY(EditAnywhere)
 	class UEnemyFSM* fsm;
 
+	UPROPERTY(EditAnywhere)
+	int32 maxHP = 3;
+	int32 currHP = 0;
+
+public:
+	void DamageProcess(int32 damage);
 };

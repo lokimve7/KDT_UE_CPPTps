@@ -43,14 +43,14 @@ void AEnemy::BeginPlay()
 {
 	Super::BeginPlay();
 	
+	// 현재 HP 를 maxHP 로 하자
+	currHP = maxHP;
 }
 
 // Called every frame
 void AEnemy::Tick(float DeltaTime)
 {
-	Super::Tick(DeltaTime);
-
-	
+	Super::Tick(DeltaTime);	
 }
 
 // Called to bind functionality to input
@@ -58,5 +58,23 @@ void AEnemy::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
 
+}
+
+void AEnemy::DamageProcess(int32 damage)
+{
+	// HP 를 줄이자
+	currHP -= damage;
+	// 만약에 HP 가 0보다 크면
+	if (currHP > 0)
+	{
+		// DAMAGE 상태로 전환
+		fsm->ChangeState(EEnemyState::DAMAGE);
+	}
+	// 그렇지 않으면 (HP 가 0)
+	else
+	{
+		// DIE 로 상태로 전환
+		fsm->ChangeState(EEnemyState::DIE);
+	}
 }
 

@@ -385,13 +385,14 @@ void ATpsPlayer::EnhancedRealFire()
 					impactEffect, 
 					hitInfo.ImpactPoint,
 					rot);
+								
 
 				// 맞은놈이 Enemy 라면 DAMAGE 상태로 전환
 				if (hitInfo.GetComponent()->GetCollisionObjectType() == ECC_GameTraceChannel1)
 				{
 					AActor* hitActor = hitInfo.GetActor();
 					AEnemy* enemy = Cast<AEnemy>(hitActor);
-					enemy->fsm->ChangeState(EEnemyState::DAMAGE);
+					enemy->DamageProcess(1);					
 				}
 			}
 		}

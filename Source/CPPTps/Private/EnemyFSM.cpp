@@ -62,6 +62,15 @@ void UEnemyFSM::TickComponent(float DeltaTime, ELevelTick TickType, FActorCompon
 
 void UEnemyFSM::ChangeState(EEnemyState s)
 {
+	// 바뀌는 상태를 출력하자
+	UEnum* enumPtr = FindObject<UEnum>(ANY_PACKAGE, TEXT("EEnemyState"), true);
+	if (enumPtr != nullptr)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("%s -------> %s"),
+			*enumPtr->GetNameStringByIndex((int32)currState),
+			*enumPtr->GetNameStringByIndex((int32)s));
+	}	
+
 	// 현재 상태를 갱신
 	currState = s;
 	
@@ -80,6 +89,9 @@ void UEnemyFSM::ChangeState(EEnemyState s)
 		// 바로 공격 가능하게 현재시간을 attackDelayTime 으로 설정
 		currTime = attackDelayTime;
 		break;
+	case EEnemyState::DIE:
+		myActor->Destroy();
+		break;
 	default:
 		break;
 	}
@@ -96,8 +108,6 @@ void UEnemyFSM::UpdateIdle()
 		// 3. 현재 상태를 MOVE 로 바꾸자
 		ChangeState(EEnemyState::MOVE);
 	}
-
-	UE_LOG(LogTemp, Warning, TEXT("IDLE"));
 }
 
 void UEnemyFSM::UpdateMove()
@@ -115,8 +125,6 @@ void UEnemyFSM::UpdateMove()
 		// 4. 현재 상태를 ATTACK 로 바꾸자
 		ChangeState(EEnemyState::ATTACK);	
 	}	
-
-	UE_LOG(LogTemp, Warning, TEXT("MOVE"));
 }
 
 void UEnemyFSM::UpdateAttack()
@@ -132,7 +140,7 @@ void UEnemyFSM::UpdateAttack()
 		if (dist < attackRange)
 		{
 			// 3. 진짜 공격!!
-			UE_LOG(LogTemp, Warning, TEXT("ATTACK"));
+			UE_LOG(LogTemp, Warning, TEXT("Real ATTACK"));
 		}
 		// 인지범위 -> 이동 
 		else if (dist < traceRange)
