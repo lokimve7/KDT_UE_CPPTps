@@ -18,6 +18,7 @@
 #include "TpsGameInstance.h"
 #include "Enemy.h"
 #include "EnemyFSM.h"
+#include "InvenWidget.h"
 
 // Sets default values
 ATpsPlayer::ATpsPlayer()
@@ -172,6 +173,11 @@ void ATpsPlayer::BeginPlay()
 
 	// currWeaponMode 의 값에 따라서 무기를 선택하자
 	ChangeWeapon(currWeaponMode);
+
+	
+
+	// 인벤토리 Widget 생성
+	inven = CreateWidget<UInvenWidget>(GetWorld(), invenFactory);
  }
 
 // Called every frame
@@ -204,7 +210,10 @@ void ATpsPlayer::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent
 
 		input->BindAction(ia_RealFire, ETriggerEvent::Triggered, this, &ATpsPlayer::EnhancedRealFire);
 
+		//---------------------
 		input->BindAction(ia_GetItem, ETriggerEvent::Triggered, this, &ATpsPlayer::InputGetItem);
+
+		input->BindAction(ia_OnOffInven, ETriggerEvent::Triggered, this, &ATpsPlayer::InputOnOffInventory);
 	}
 }
 
@@ -407,5 +416,19 @@ void ATpsPlayer::InputGetItem(const struct FInputActionValue& value)
 	//actionValue 해당 되는 아이템을 추가( compInven->myItems 에)
 	UTpsGameInstance* gameInstance = Cast<UTpsGameInstance>(UGameplayStatics::GetGameInstance(GetWorld()));
 	compInven->myItems.Add(gameInstance->defineItem[actionValue]);
+}
+
+void ATpsPlayer::InputOnOffInventory()
+{
+	// 만약에 Inven 이 화면에 붙어있으면 지우고
+	if (inven->IsInViewport())
+	{
+		inven->RemoveFromParent();
+	}
+	// 그렇지 않으면 화면에 붙이자
+	else
+	{
+		inven->AddToViewport();
+	}
 }
 

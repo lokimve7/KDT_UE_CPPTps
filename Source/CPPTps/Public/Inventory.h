@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "Components/ActorComponent.h"
+#include <Engine/DataTable.h>
 #include "Inventory.generated.h"
 
 UENUM(BlueprintType)
@@ -16,7 +17,7 @@ enum class EItemType : uint8
 };
 
 USTRUCT(BlueprintType)
-struct FItemData
+struct FItemData : public FTableRowBase
 {
 	GENERATED_BODY()
 public:

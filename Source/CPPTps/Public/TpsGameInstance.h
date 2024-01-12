@@ -14,6 +14,9 @@ class CPPTPS_API UTpsGameInstance : public UGameInstance
 {
 	GENERATED_BODY()
 
+public:
+	UTpsGameInstance();
+
 protected:
 	virtual void Init() override;
 	

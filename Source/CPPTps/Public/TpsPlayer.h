@@ -127,8 +127,15 @@ public:
 	class UInventory* compInven;
 	UPROPERTY(EditAnywhere)
 	class UInputAction* ia_GetItem;
+	UPROPERTY(EditAnywhere)
+	class UInputAction* ia_OnOffInven;
+	UPROPERTY(EditAnywhere)
+	TSubclassOf<class UInvenWidget> invenFactory;
+	UPROPERTY(EditAnywhere)
+	class UInvenWidget* inven;
 
 public:
 	void InputGetItem(const struct FInputActionValue& value);
+	void InputOnOffInventory();
 };
 
