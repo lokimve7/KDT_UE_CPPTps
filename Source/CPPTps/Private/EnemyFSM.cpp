@@ -52,16 +52,21 @@ void UEnemyFSM::TickComponent(float DeltaTime, ELevelTick TickType, FActorCompon
 	case EEnemyState::ATTACK:
 		UpdateAttack();
 		break;
+	case EEnemyState::DAMAGE:
+		UpdateDamaged(DeltaTime);
+		break;
 	default:
 		break;
 	}
-	
 }
 
 void UEnemyFSM::ChangeState(EEnemyState s)
 {
 	// 현재 상태를 갱신
 	currState = s;
+	
+	// 현재 시간을 초기화
+	currTime = 0;
 
 	switch (currState)
 	{
@@ -142,6 +147,17 @@ void UEnemyFSM::UpdateAttack()
 		
 		// 4. 현재시간 초기화
 		currTime = 0;
+	}
+}
+
+void UEnemyFSM::UpdateDamaged(float deltaTime)
+{
+	// damageDelayTime 기다렸다가
+	currTime += deltaTime;
+	if (currTime > damageDelayTime)
+	{
+		// IDLE 상태로 전환
+		ChangeState(EEnemyState::IDLE);
 	}
 }
 

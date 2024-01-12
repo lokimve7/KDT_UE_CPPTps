@@ -5,6 +5,7 @@
 
 #include "EnemyFSM.h"
 #include <GameFramework/CharacterMovementComponent.h>
+#include <Components/CapsuleComponent.h>
 
 // Sets default values
 AEnemy::AEnemy()
@@ -28,6 +29,13 @@ AEnemy::AEnemy()
 
 	// 이동 방향으로 나를 회전 시켜줘 옵션 활성화
 	GetCharacterMovement()->bOrientRotationToMovement = true;
+
+
+
+	// Capsule 컴포넌트 CollisonPreset = EnemyProfile
+	// Mesh 컴포넌트 CollisionPreset = NoCollision
+	GetCapsuleComponent()->SetCollisionProfileName(TEXT("EnemyProfile"));
+	GetMesh()->SetCollisionProfileName(TEXT("NoCollision"));
 }
 
 // Called when the game starts or when spawned

@@ -8,11 +8,12 @@
 
 // Enemy 상태를 정의 (enum 열거형)
 UENUM(BlueprintType)
-enum EEnemyState : uint8
+enum class EEnemyState : uint8
 {
 	IDLE,
 	MOVE,
-	ATTACK
+	ATTACK,
+	DAMAGE
 };
 
 
@@ -56,6 +57,9 @@ public:
 	// 공격대기시간
 	UPROPERTY(EditAnywhere)
 	float attackDelayTime = 2;
+	// 피격대기시간
+	UPROPERTY(EditAnywhere)
+	float damageDelayTime = 2;
 
 public:
 	// 상태가 바뀔때 한번 실행 되는 함수
@@ -66,4 +70,6 @@ public:
 	void UpdateMove();
 	// 공격
 	void UpdateAttack();
+	// 피격
+	void UpdateDamaged(float deltaTime);
 };
