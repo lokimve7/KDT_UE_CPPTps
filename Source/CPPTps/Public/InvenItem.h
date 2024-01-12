@@ -14,4 +14,7 @@ class CPPTPS_API UInvenItem : public UUserWidget
 {
 	GENERATED_BODY()
 	
+public:
+	UPROPERTY(meta = (BindWidget))
+	class UImage* thumbnail;
 };

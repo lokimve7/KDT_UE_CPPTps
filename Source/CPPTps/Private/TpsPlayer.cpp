@@ -429,6 +429,8 @@ void ATpsPlayer::InputOnOffInventory()
 	else
 	{
 		inven->AddToViewport();
+		// 인벤토리 새로고침
+		inven->RefreshInven(compInven->myItems);
 	}
 }
 

@@ -13,5 +13,17 @@ UCLASS()
 class CPPTPS_API UInvenWidget : public UUserWidget
 {
 	GENERATED_BODY()
+
+protected:
+	virtual void NativeConstruct() override;
+
+public:
+	UPROPERTY()
+	TSubclassOf<class UInvenItem> itemFactory;
 	
+	UPROPERTY(EditAnywhere, meta = (BindWidget))
+	class UCanvasPanel* invenPanel;
+
+public:
+	void RefreshInven(TArray<struct FItemData> myItems);
 };
