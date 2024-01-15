@@ -48,13 +48,20 @@ public:
 	EEnemyState currState = EEnemyState::IDLE;
 
 	// 타겟 (Player)
+	UPROPERTY()
 	class ATpsPlayer* target;
 
 	// 이 컴포넌트가 어떤 액터에 붙어있는지
+	UPROPERTY()
 	class AEnemy* myActor;
 
 	// 나한테 설정되어 있는 Animation class 가져올 변수
+	UPROPERTY()
 	class UAnimEnemy* anim;
+
+	// Enemy Montage 담을 변수
+	UPROPERTY(EditAnywhere)
+	class UAnimMontage* montage;
 
 	// 쫓아 갈 수 있는 범위 (인지 범위)
 	UPROPERTY(EditAnywhere)
@@ -86,4 +93,9 @@ public:
 	void UpdateAttackDelay();
 	// 피격
 	void UpdateDamaged(float deltaTime);
+	// 죽음
+	void UpdateDie();
+
+	// 시간 체크 함수
+	bool IsWaitComplete(float delay);
 };

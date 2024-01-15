@@ -6,6 +6,7 @@
 #include "TpsPlayer.h"
 #include "Enemy.h"
 #include "AnimEnemy.h"
+#include <Components/CapsuleComponent.h>
 
 // Sets default values for this component's properties
 UEnemyFSM::UEnemyFSM()
@@ -14,7 +15,12 @@ UEnemyFSM::UEnemyFSM()
 	// off to improve performance if you don't need them.
 	PrimaryComponentTick.bCanEverTick = true;
 	
-	// ...
+	// montage 읽어오자
+	ConstructorHelpers::FObjectFinder<UAnimMontage> tempMontage(TEXT("/Script/Engine.AnimMontage'/Game/Blueprints/OnlyBlueprints/EnemyMontage.EnemyMontage'"));
+	if (tempMontage.Succeeded())
+	{
+		montage = tempMontage.Object;
+	}
 }
 
 
@@ -64,6 +70,9 @@ void UEnemyFSM::TickComponent(float DeltaTime, ELevelTick TickType, FActorCompon
 	case EEnemyState::DAMAGE:
 		UpdateDamaged(DeltaTime);
 		break;
+	case EEnemyState::DIE:
+		UpdateDie();
+		break;
 	default:
 		break;
 	}
@@ -99,15 +108,27 @@ void UEnemyFSM::ChangeState(EEnemyState s)
 		break;
 	case EEnemyState::ATTACK:
 	{
-		// 바로 공격 가능하게 현재시간을 attackDelayTime 으로 설정
-		currTime = attackDelayTime;
 		// 킥, 펀치 공격할지 설정
 		int32 rand = FMath::RandRange(0, 1);
 		anim->attackType = (EAttackType)rand;
 	}
 		break;
+	case EEnemyState::DAMAGE:
+	{
+		// 1. 랜덤한 값을 뽑는다. (1, 2)
+		int32 rand = FMath::RandRange(1, 2);
+		// 2. Damage01, Damage02 란 문자열을 만든다.
+		FString sectionName = FString::Printf(TEXT("Damage0%d"), rand);
+		// 3. Montage 플레이
+		myActor->PlayAnimMontage(montage, 1.0f, FName(*sectionName));
+	}
+		break;
 	case EEnemyState::DIE:
-		myActor->Destroy();
+		// 죽는 애니메이션 플레이
+		myActor->PlayAnimMontage(montage, 1.0f, TEXT("Die"));
+		// 충돌 처리 되지 않게 하자		
+		myActor->GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+		// myActor->Destroy();
 		break;
 	default:
 		break;
@@ -150,11 +171,13 @@ void UEnemyFSM::UpdateAttack()
 }
 
 void UEnemyFSM::UpdateAttackDelay()
-{
-	// 1. 시간을 흐르게 한다.
-	currTime += GetWorld()->DeltaTimeSeconds;
-	// 2. 만약에 Attack Delay 시간이 지나면
-	if (currTime > attackDelayTime)
+{	
+	//// 1. 시간을 흐르게 한다.
+	//currTime += GetWorld()->DeltaTimeSeconds;
+	//// 2. 만약에 Attack Delay 시간이 지나면
+	//if (currTime > attackDelayTime)
+
+	if (IsWaitComplete(attackDelayTime))
 	{
 		// 플레어와의 거리
 		float dist = FVector::Distance(target->GetActorLocation(), myActor->GetActorLocation());
@@ -182,12 +205,37 @@ void UEnemyFSM::UpdateAttackDelay()
 
 void UEnemyFSM::UpdateDamaged(float deltaTime)
 {
-	// damageDelayTime 기다렸다가
-	currTime += deltaTime;
-	if (currTime > damageDelayTime)
+	if (IsWaitComplete(damageDelayTime))
 	{
 		// IDLE 상태로 전환
 		ChangeState(EEnemyState::IDLE);
 	}
+
+	//// damageDelayTime 기다렸다가
+	//currTime += deltaTime;
+	//if (currTime > damageDelayTime)
+	//{
+	//	// IDLE 상태로 전환
+	//	ChangeState(EEnemyState::IDLE);
+	//}
+}
+
+void UEnemyFSM::UpdateDie()
+{
+	if (IsWaitComplete(3))
+	{
+		myActor->Destroy();
+	}
+}
+
+bool UEnemyFSM::IsWaitComplete(float delay)
+{
+	currTime += GetWorld()->DeltaTimeSeconds;
+	if (currTime >= delay)
+	{
+		return true;
+	}
+
+	return false;
 }
 

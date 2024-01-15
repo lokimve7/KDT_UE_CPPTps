@@ -21,4 +21,8 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	EAttackType attackType;
+
+public:
+	UFUNCTION()
+	void AnimNotify_OnDamage();
 };

@@ -3,3 +3,7 @@
 
 #include "AnimEnemy.h"
 
+void UAnimEnemy::AnimNotify_OnDamage()
+{
+	UE_LOG(LogTemp, Warning, TEXT("OnDamage!!!!!!"));
+}
