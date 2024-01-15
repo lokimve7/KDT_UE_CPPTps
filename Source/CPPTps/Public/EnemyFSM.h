@@ -13,10 +13,18 @@ enum class EEnemyState : uint8
 	IDLE,
 	MOVE,
 	ATTACK,
+	ATTACK_DELAY,
 	DAMAGE,
 	DIE
 };
 
+// Enemy 공격 모션 정의
+UENUM(BlueprintType)
+enum class EAttackType : uint8
+{
+	KICK,
+	PUNCH
+};
 
 
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
@@ -45,6 +53,9 @@ public:
 	// 이 컴포넌트가 어떤 액터에 붙어있는지
 	class AEnemy* myActor;
 
+	// 나한테 설정되어 있는 Animation class 가져올 변수
+	class UAnimEnemy* anim;
+
 	// 쫓아 갈 수 있는 범위 (인지 범위)
 	UPROPERTY(EditAnywhere)
 	float traceRange = 1000;
@@ -71,6 +82,8 @@ public:
 	void UpdateMove();
 	// 공격
 	void UpdateAttack();
+	// 공격 대기
+	void UpdateAttackDelay();
 	// 피격
 	void UpdateDamaged(float deltaTime);
 };

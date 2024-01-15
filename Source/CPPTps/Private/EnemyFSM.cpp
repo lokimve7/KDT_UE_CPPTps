@@ -5,6 +5,7 @@
 #include <Kismet/GameplayStatics.h>
 #include "TpsPlayer.h"
 #include "Enemy.h"
+#include "AnimEnemy.h"
 
 // Sets default values for this component's properties
 UEnemyFSM::UEnemyFSM()
@@ -29,7 +30,12 @@ void UEnemyFSM::BeginPlay()
 	// 나의 액터를 찾자
 	myActor = Cast<AEnemy>(GetOwner());
 
-	
+	// 나한테 설정되어 있는 Anim Class 가져오자
+	USkeletalMeshComponent* mesh = myActor->GetMesh();
+	UAnimInstance* animInstance = mesh->GetAnimInstance();
+	anim = Cast<UAnimEnemy>(animInstance);
+
+	//anim = Cast<UAnimEnemy>(myActor->GetMesh()->GetAnimInstance());
 }
 
 
@@ -52,6 +58,9 @@ void UEnemyFSM::TickComponent(float DeltaTime, ELevelTick TickType, FActorCompon
 	case EEnemyState::ATTACK:
 		UpdateAttack();
 		break;
+	case EEnemyState::ATTACK_DELAY:
+		UpdateAttackDelay();
+		break;
 	case EEnemyState::DAMAGE:
 		UpdateDamaged(DeltaTime);
 		break;
@@ -73,6 +82,9 @@ void UEnemyFSM::ChangeState(EEnemyState s)
 
 	// 현재 상태를 갱신
 	currState = s;
+
+	// 애니메이션 상태 갱신
+	anim->state = currState;
 	
 	// 현재 시간을 초기화
 	currTime = 0;
@@ -86,8 +98,13 @@ void UEnemyFSM::ChangeState(EEnemyState s)
 
 		break;
 	case EEnemyState::ATTACK:
+	{
 		// 바로 공격 가능하게 현재시간을 attackDelayTime 으로 설정
 		currTime = attackDelayTime;
+		// 킥, 펀치 공격할지 설정
+		int32 rand = FMath::RandRange(0, 1);
+		anim->attackType = (EAttackType)rand;
+	}
 		break;
 	case EEnemyState::DIE:
 		myActor->Destroy();
@@ -129,6 +146,11 @@ void UEnemyFSM::UpdateMove()
 
 void UEnemyFSM::UpdateAttack()
 {
+	ChangeState(EEnemyState::ATTACK_DELAY);
+}
+
+void UEnemyFSM::UpdateAttackDelay()
+{
 	// 1. 시간을 흐르게 한다.
 	currTime += GetWorld()->DeltaTimeSeconds;
 	// 2. 만약에 Attack Delay 시간이 지나면
@@ -139,8 +161,8 @@ void UEnemyFSM::UpdateAttack()
 		// 그 거리가 공격범위- > 진짜 공격
 		if (dist < attackRange)
 		{
-			// 3. 진짜 공격!!
-			UE_LOG(LogTemp, Warning, TEXT("Real ATTACK"));
+			// 3. 공격 상태로 가라
+			ChangeState(EEnemyState::ATTACK);
 		}
 		// 인지범위 -> 이동 
 		else if (dist < traceRange)
@@ -152,7 +174,7 @@ void UEnemyFSM::UpdateAttack()
 		{
 			ChangeState(EEnemyState::IDLE);
 		}
-		
+
 		// 4. 현재시간 초기화
 		currTime = 0;
 	}
