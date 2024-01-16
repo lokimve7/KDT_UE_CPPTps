@@ -26,4 +26,8 @@ public:
 	// 좌, 우 판별 변수
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	float dirR = 0;
+
+	// 공중에 떠 있는지 여부
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	bool isAir = false;
 };

@@ -2,13 +2,15 @@
 
 
 #include "AnimPlayer.h"
+#include "TpsPlayer.h"
+#include <GameFramework/CharacterMovementComponent.h>
 
 void UAnimPlayer::NativeUpdateAnimation(float DeltaSeconds)
 {
 	Super::NativeUpdateAnimation(DeltaSeconds);
 
 	// 내가 붙어있는 Pawn 을 가져오자
-	APawn* pawn = TryGetPawnOwner();
+	ATpsPlayer* pawn = Cast<ATpsPlayer>(TryGetPawnOwner());
 	if (pawn != nullptr)
 	{
 		// 나의 앞방향
@@ -36,5 +38,9 @@ void UAnimPlayer::NativeUpdateAnimation(float DeltaSeconds)
 		// 위 값이 0보다 크면 오른쪽 방향, 0보다 작으면 왼쪽 방향
 		dirR = FVector::DotProduct(right, moveDir);
 		//UE_LOG(LogTemp, Warning, TEXT("dot : %f"), dirR);
+		
+		// 플레이어가 공중에 있는지 여부
+		UCharacterMovementComponent* movement = pawn->GetCharacterMovement();
+		isAir = movement->IsFalling();
 	}
 }
