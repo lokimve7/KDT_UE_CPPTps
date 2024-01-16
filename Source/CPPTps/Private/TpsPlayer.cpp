@@ -95,11 +95,11 @@ ATpsPlayer::ATpsPlayer()
 
 	// gun 컴포넌트 생성
 	gun = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("GUN"));
-	gun->SetupAttachment(RootComponent);
-	gun->SetRelativeLocation(FVector(45, 35, 45));
+	gun->SetupAttachment(GetMesh(), TEXT("WeaponPos"));
+	gun->SetRelativeLocation(FVector(-6.31f, 4.85f, -3.4f));
 	//(Pitch = 0.000000, Yaw = -90.000000, Roll = 0.000000)
 	//pitch yaw roll
-	gun->SetRelativeRotation(FRotator(0, -90, 0));
+	gun->SetRelativeRotation(FRotator(0, 90, 0));
 
 	// gun 모양 읽어오자
 	ConstructorHelpers::FObjectFinder<USkeletalMesh> tempGun(TEXT("/Script/Engine.SkeletalMesh'/Game/MilitaryWeapSilver/Weapons/Assault_Rifle_A.Assault_Rifle_A'"));
@@ -110,9 +110,9 @@ ATpsPlayer::ATpsPlayer()
 
 	// sniper 컴포넌트 생성
 	sniper = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("SNIPER"));
-	sniper->SetupAttachment(RootComponent);
-	sniper->SetRelativeLocation(FVector(45, 64, 45));
-	sniper->SetRelativeRotation(FRotator(0, -90, 0));
+	sniper->SetupAttachment(GetMesh(), TEXT("WeaponPos"));
+	sniper->SetRelativeLocation(FVector(-6.31f, 4.85f, -3.4f));
+	sniper->SetRelativeRotation(FRotator(0, 90, 0));
 	// sniper 모양 읽어오자
 	ConstructorHelpers::FObjectFinder<USkeletalMesh> tempSniper(TEXT("/Script/Engine.SkeletalMesh'/Game/MilitaryWeapSilver/Weapons/Sniper_Rifle_A.Sniper_Rifle_A'"));
 	if (tempSniper.Succeeded())
@@ -142,8 +142,8 @@ void ATpsPlayer::BeginPlay()
 {
 	Super::BeginPlay();
 
-	// 움직이는 속력을 moveSpeed 로 하자
-	GetCharacterMovement()->MaxWalkSpeed = moveSpeed;
+	// 움직이는 속력을 walkSpeed 로 하자
+	GetCharacterMovement()->MaxWalkSpeed = walkSpeed;
 
 	// Controller 의 회전값을 따라 갈지 여부
 	bUseControllerRotationYaw = true;
@@ -209,6 +209,9 @@ void ATpsPlayer::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent
 		input->BindAction(ia_Zoom, ETriggerEvent::Triggered, this, &ATpsPlayer::EnhancedZoom);
 
 		input->BindAction(ia_RealFire, ETriggerEvent::Triggered, this, &ATpsPlayer::EnhancedRealFire);
+
+		input->BindAction(ia_Run, ETriggerEvent::Triggered, this, &ATpsPlayer::EnhancedRun);
+
 
 		//---------------------
 		input->BindAction(ia_GetItem, ETriggerEvent::Triggered, this, &ATpsPlayer::InputGetItem);
@@ -406,6 +409,22 @@ void ATpsPlayer::EnhancedRealFire()
 			}
 		}
 		break;
+	}
+}
+
+void ATpsPlayer::EnhancedRun(const struct FInputActionValue& value)
+{
+	bool actionValue = value.Get<bool>();
+	
+	if (actionValue)
+	{
+		// 달리기 모드
+		GetCharacterMovement()->MaxWalkSpeed = runSpeed;
+	}
+	else
+	{
+		// 걷기 모드
+		GetCharacterMovement()->MaxWalkSpeed = walkSpeed;
 	}
 }
 

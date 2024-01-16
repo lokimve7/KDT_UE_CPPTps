@@ -48,7 +48,8 @@ public:
 	UPROPERTY(EditAnywhere)
 	class USkeletalMeshComponent* sniper;
 
-	float moveSpeed = 500;
+	float runSpeed = 500;
+	float walkSpeed = 200;
 
 	// 선택한 무기 (1 : 라이플, 2 : 스나이퍼)
 	EWeaponType currWeaponMode = EWeaponType::GUN;
@@ -85,6 +86,10 @@ public:
 	UPROPERTY(EditAnywhere)
 	class UInputAction* ia_RealFire;
 
+	// InputAction Run
+	UPROPERTY(EditAnywhere)
+	class UInputAction* ia_Run;
+
 	// 총알 Blueprint (총알공장)
 	UPROPERTY(EditAnywhere)
 	TSubclassOf<class ABullet> bulletFactory;
@@ -113,6 +118,7 @@ public:
 	void EnhancedFire(const struct FInputActionValue& value);
 	void EnhancedZoom(const struct FInputActionValue& value);
 	void EnhancedRealFire();
+	void EnhancedRun(const struct FInputActionValue& value);
 
 
 
