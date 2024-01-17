@@ -127,10 +127,12 @@ ATpsPlayer::ATpsPlayer()
 		sniperWidget = tempSniperWidget.Class;
 	}
 
-
-
-
-
+	// 총 쏘는 몽타주 가져오자
+	ConstructorHelpers::FObjectFinder<UAnimMontage> tempMontage(TEXT("/Script/Engine.AnimMontage'/Game/Blueprints/Fire_Montage.Fire_Montage'"));
+	if (tempMontage.Succeeded())
+	{
+		fireMontage = tempMontage.Object;
+	}
 
 
 //-------------------------------------------
@@ -173,7 +175,6 @@ void ATpsPlayer::BeginPlay()
 
 	// currWeaponMode 의 값에 따라서 무기를 선택하자
 	ChangeWeapon(currWeaponMode);
-
 	
 
 	// 인벤토리 Widget 생성
@@ -343,6 +344,33 @@ void ATpsPlayer::EnhancedZoom(const struct FInputActionValue& value)
 
 void ATpsPlayer::EnhancedRealFire()
 {
+	// 총 쏘는 애니메이션을 하자
+	UAnimInstance* animPlayer = GetMesh()->GetAnimInstance();
+	animPlayer->Montage_Play(fireMontage);
+	// 만약에 걷고 있다면
+	if (isRun == false)
+	{
+		// Fire01 로 Montage 점프
+		animPlayer->Montage_JumpToSection(TEXT("Fire1"));
+	}
+	// 그렇지 않고 뛰고 있다면
+	else
+	{
+		// 만약에 점프 중이라면
+		if (GetCharacterMovement()->IsFalling())
+		{
+			// Fire01 로 Montage 점프
+			animPlayer->Montage_JumpToSection(TEXT("Fire1"));
+		}
+		// 바닥에 있다면
+		else
+		{
+			// FIre02 로 Montage 점프
+			animPlayer->Montage_JumpToSection(TEXT("Fire2"));
+		}
+	}
+
+
 	switch (currWeaponMode)
 	{
 		case EWeaponType::GUN:
@@ -415,7 +443,10 @@ void ATpsPlayer::EnhancedRealFire()
 void ATpsPlayer::EnhancedRun(const struct FInputActionValue& value)
 {
 	bool actionValue = value.Get<bool>();
-	
+
+	// 걷기 상태인지 달리기 상태인지 구분
+	isRun = actionValue;
+
 	if (actionValue)
 	{
 		// 달리기 모드
