@@ -7,6 +7,8 @@
 #include "Enemy.h"
 #include "AnimEnemy.h"
 #include <Components/CapsuleComponent.h>
+#include <AIController.h>
+
 
 // Sets default values for this component's properties
 UEnemyFSM::UEnemyFSM()
@@ -42,6 +44,13 @@ void UEnemyFSM::BeginPlay()
 	anim = Cast<UAnimEnemy>(animInstance);
 
 	//anim = Cast<UAnimEnemy>(myActor->GetMesh()->GetAnimInstance());
+
+	// AI Controller 찾자
+	ai = Cast<AAIController>(myActor->GetController());
+
+	// 시야각을 cos(시야각) 으로 하자
+	float radianViewAngle = FMath::DegreesToRadians(viewAngle * 0.5f);
+	viewAngle = FMath::Cos(radianViewAngle);
 }
 
 
@@ -88,6 +97,9 @@ void UEnemyFSM::ChangeState(EEnemyState s)
 			*enumPtr->GetNameStringByIndex((int32)currState),
 			*enumPtr->GetNameStringByIndex((int32)s));
 	}	
+
+	// 네비게이션 동작 멈춰
+	ai->StopMovement();
 
 	// 현재 상태를 갱신
 	currState = s;
@@ -137,15 +149,12 @@ void UEnemyFSM::ChangeState(EEnemyState s)
 
 void UEnemyFSM::UpdateIdle()
 {
-	// 1. 플레이어와의 거리를 구하자.
-	FVector dir = target->GetActorLocation() - myActor->GetActorLocation();
-	float dist = dir.Length();
-	// 2. 만약에 거리가 인지범위 보다 작으면 (플레이어를 쫓아갈 수 있는 상태)
-	if (dist < traceRange)
+	// 만약에 플레이어를 쫓아갈 수 있다면
+	if (CanTrace())
 	{
-		// 3. 현재 상태를 MOVE 로 바꾸자
+		// 상태를 Move 로 바꿔라
 		ChangeState(EEnemyState::MOVE);
-	}
+	}	
 }
 
 void UEnemyFSM::UpdateMove()
@@ -153,8 +162,12 @@ void UEnemyFSM::UpdateMove()
 	// 1. 플레이어를 향하는 방향을 구하자
 	FVector dir = target->GetActorLocation() - myActor->GetActorLocation();
 	
-	// 2. 그 방향으로 움직이자. 
-	myActor->AddMovementInput(dir.GetSafeNormal());
+
+	// 2. target 위치로 움직이자 (Navigation  기능을 통해서)
+	ai->MoveToLocation(target->GetActorLocation());
+
+	//// 2. 그 방향으로 움직이자. 
+	//myActor->AddMovementInput(dir.GetSafeNormal());
 
 	// 3. 플레이어와의 거리가 공격 범위보다 작으면
 	float dist = dir.Length();
@@ -188,7 +201,7 @@ void UEnemyFSM::UpdateAttackDelay()
 			ChangeState(EEnemyState::ATTACK);
 		}
 		// 인지범위 -> 이동 
-		else if (dist < traceRange)
+		else if (CanTrace())
 		{
 			ChangeState(EEnemyState::MOVE);
 		}
@@ -234,6 +247,36 @@ bool UEnemyFSM::IsWaitComplete(float delay)
 	if (currTime >= delay)
 	{
 		return true;
+	}
+
+	return false;
+}
+
+bool UEnemyFSM::CanTrace()
+{
+	// 1. 플레이어와의 거리를 구하자.
+	FVector dir = target->GetActorLocation() - myActor->GetActorLocation();
+	float dist = dir.Length();
+	// 2. 만약에 거리가 인지범위 보다 작으면
+	if (dist < traceRange)
+	{
+		// 나의 앞방향과 플레어를 향하는 방향을 내적
+		float dot = FVector::DotProduct(dir.GetSafeNormal(), myActor->GetActorForwardVector());
+
+		if (dot > viewAngle)
+		{
+			return true;
+		}
+
+		//// 내적한 값을 acos 하자
+		//float radianAngle = FMath::Acos(dot);
+		//// degree 값으로 변경하자
+		//float degreeAngle = FMath::RadiansToDegrees(radianAngle);
+		//// 만약에 플레이어가 시약각(60)에 들어왔다면 (degreeAngle <= 60 / 2) 
+		//if (degreeAngle <= 180 * 0.5f)
+		//{
+		//	return true;
+		//}
 	}
 
 	return false;
