@@ -147,8 +147,19 @@ public:
 	UPROPERTY(EditAnywhere)
 	class UInvenWidget* inven;
 
+	UPROPERTY()
+	class UInvenItem* onHoverItem = nullptr;
+
 public:
 	void InputGetItem(const struct FInputActionValue& value);
 	void InputOnOffInventory();
+
+	UFUNCTION()
+	void OnHoverItem(class UInvenItem* invenItem);
+
+	UFUNCTION()
+	void InputRMouseClick();
+	UFUNCTION()
+	void InputMouseUp();
 };
 

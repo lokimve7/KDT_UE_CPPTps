@@ -19,11 +19,18 @@ protected:
 
 public:
 	UPROPERTY()
+	class ATpsPlayer* player;
+
+	UPROPERTY()
 	TSubclassOf<class UInvenItem> itemFactory;
 	
 	UPROPERTY(EditAnywhere, meta = (BindWidget))
 	class UCanvasPanel* invenPanel;
 
+	UPROPERTY()
+	TArray<class UInvenItem*> allItemWidget;
+
 public:
 	void RefreshInven(TArray<struct FItemData> myItems);
+	void CreateItem(FItemData itemData, int32 i);
 };

@@ -19,6 +19,7 @@
 #include "Enemy.h"
 #include "EnemyFSM.h"
 #include "InvenWidget.h"
+#include "InvenItem.h"
 
 // Sets default values
 ATpsPlayer::ATpsPlayer()
@@ -219,6 +220,9 @@ void ATpsPlayer::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent
 
 		input->BindAction(ia_OnOffInven, ETriggerEvent::Triggered, this, &ATpsPlayer::InputOnOffInventory);
 	}
+
+	PlayerInputComponent->BindAction(TEXT("RMouseClick"), IE_Pressed, this, &ATpsPlayer::InputRMouseClick);
+	PlayerInputComponent->BindAction(TEXT("RMouseClick"), IE_Released, this, &ATpsPlayer::InputMouseUp);
 }
 
 void ATpsPlayer::MoveAction(FVector2d keyboardInput)
@@ -466,6 +470,16 @@ void ATpsPlayer::InputGetItem(const struct FInputActionValue& value)
 	//actionValue 해당 되는 아이템을 추가( compInven->myItems 에)
 	UTpsGameInstance* gameInstance = Cast<UTpsGameInstance>(UGameplayStatics::GetGameInstance(GetWorld()));
 	compInven->myItems.Add(gameInstance->defineItem[actionValue]);
+
+	// 만약에 Inven 이 열려있다면 
+	if (inven->IsInViewport())
+	{
+		// 추가 되는 아이템이 몇 번째에 있는지
+		int32 idx = compInven->myItems.Num() - 1;
+
+		// Inven 에 아이템이 추가된 것을 보여주자
+		inven->CreateItem(compInven->myItems[idx], idx);
+	}
 }
 
 void ATpsPlayer::InputOnOffInventory()
@@ -474,6 +488,8 @@ void ATpsPlayer::InputOnOffInventory()
 	if (inven->IsInViewport())
 	{
 		inven->RemoveFromParent();
+		// 마우스 포인터 비활성
+		GetWorld()->GetFirstPlayerController()->SetShowMouseCursor(false);
 	}
 	// 그렇지 않으면 화면에 붙이자
 	else
@@ -481,6 +497,31 @@ void ATpsPlayer::InputOnOffInventory()
 		inven->AddToViewport();
 		// 인벤토리 새로고침
 		inven->RefreshInven(compInven->myItems);
+		// 마우스 포인터 활성화
+		GetWorld()->GetFirstPlayerController()->SetShowMouseCursor(true);
+
 	}
+}
+
+void ATpsPlayer::OnHoverItem(class UInvenItem* invenItem)
+{
+	onHoverItem = invenItem;	
+}
+
+void ATpsPlayer::InputRMouseClick()
+{
+	if(onHoverItem ==nullptr) return;
+
+	// 해당 아이템 사용	
+	compInven->myItems.RemoveAt(onHoverItem->idxInInven);
+
+	UE_LOG(LogTemp, Warning, TEXT("%s"), *onHoverItem->itemData.name);
+
+	inven->RefreshInven(compInven->myItems);
+}
+
+void ATpsPlayer::InputMouseUp()
+{
+	onHoverItem = nullptr;
 }
 
