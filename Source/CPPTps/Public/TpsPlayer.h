@@ -159,5 +159,8 @@ public:
 	void InputRMouseClick();
 	UFUNCTION()
 	void InputMouseUp();
+
+	UFUNCTION()
+	void InputLMouseClick();
 };
 

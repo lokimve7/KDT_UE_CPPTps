@@ -232,6 +232,10 @@ void ATpsPlayer::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent
 
 	PlayerInputComponent->BindAction(TEXT("RMouseClick"), IE_Pressed, this, &ATpsPlayer::InputRMouseClick);
 	PlayerInputComponent->BindAction(TEXT("RMouseClick"), IE_Released, this, &ATpsPlayer::InputMouseUp);
+
+	PlayerInputComponent->BindAction(TEXT("LMouseClick"), IE_Pressed, this, &ATpsPlayer::InputLMouseClick);
+	PlayerInputComponent->BindAction(TEXT("LMouseClick"), IE_Released, this, &ATpsPlayer::InputMouseUp);
+
 }
 
 void ATpsPlayer::MoveAction(FVector2d keyboardInput)
@@ -530,6 +534,18 @@ void ATpsPlayer::InputRMouseClick()
 
 void ATpsPlayer::InputMouseUp()
 {
+	if(onHoverItem == nullptr) return;
+
+	onHoverItem->EndMove();
+
+
 	onHoverItem = nullptr;
+}
+
+void ATpsPlayer::InputLMouseClick()
+{
+	if(onHoverItem == nullptr) return;
+
+	onHoverItem->BeginMove();
 }
 
