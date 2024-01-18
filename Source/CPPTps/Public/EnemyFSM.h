@@ -12,6 +12,7 @@ enum class EEnemyState : uint8
 {
 	IDLE,
 	MOVE,
+	RETURN,
 	ATTACK,
 	ATTACK_DELAY,
 	DAMAGE,
@@ -65,11 +66,15 @@ public:
 
 	// 쫓아 갈 수 있는 범위 (인지 범위)
 	UPROPERTY(EditAnywhere)
-	float traceRange = 1000;
+	float traceRange = 500;
 
 	// 공격 할 수 있는 범위 (공격 범위)
 	UPROPERTY(EditAnywhere)
 	float attackRange = 200;
+
+	// 내가 움직일 수 있는 범위
+	UPROPERTY(EditAnywhere)
+	float moveRange = 1000;
 
 	// 현재시간
 	float currTime = 0;
@@ -87,6 +92,9 @@ public:
 	// 시야각 ( cos(시야각) )
 	float viewAngle = 180;
 
+	// 나의 처음 위치
+	FVector originPos;
+
 public:
 	// 상태가 바뀔때 한번 실행 되는 함수
 	void ChangeState(EEnemyState s);
@@ -102,6 +110,8 @@ public:
 	void UpdateDamaged(float deltaTime);
 	// 죽음
 	void UpdateDie();
+	// 리턴
+	void UpdateReturn();
 
 	// 시간 체크 함수
 	bool IsWaitComplete(float delay);

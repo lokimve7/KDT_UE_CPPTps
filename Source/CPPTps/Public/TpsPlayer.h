@@ -49,7 +49,7 @@ public:
 	class USkeletalMeshComponent* sniper;
 
 	float runSpeed = 500;
-	float walkSpeed = 200;
+	float walkSpeed = 500;
 
 	// 선택한 무기 (1 : 라이플, 2 : 스나이퍼)
 	EWeaponType currWeaponMode = EWeaponType::GUN;
