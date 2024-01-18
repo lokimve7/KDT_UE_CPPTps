@@ -303,6 +303,24 @@ bool UEnemyFSM::CanTrace()
 
 		if (dot > viewAngle)
 		{
+			// 플레이어를 향하는 방향에 장애물이 있는지 판단 (LineTrace)
+			FVector start = myActor->GetActorLocation();
+			FVector end = target->GetActorLocation();
+			FHitResult hitInfo;
+			FCollisionQueryParams param;
+			param.AddIgnoredActor(myActor);
+
+			bool hit = GetWorld()->LineTraceSingleByChannel(hitInfo, start, end, ECC_Visibility, param);
+
+			if (hit)
+			{
+				if (hitInfo.GetActor()->GetName().Contains(TEXT("Player")) == false)
+				{
+					return false;
+				}
+			}
+			
+
 			return true;
 		}
 		
