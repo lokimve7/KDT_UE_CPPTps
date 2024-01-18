@@ -310,6 +310,7 @@ bool UEnemyFSM::CanTrace()
 			FCollisionQueryParams param;
 			param.AddIgnoredActor(myActor);
 
+
 			bool hit = GetWorld()->LineTraceSingleByChannel(hitInfo, start, end, ECC_Visibility, param);
 
 			if (hit)
@@ -318,8 +319,7 @@ bool UEnemyFSM::CanTrace()
 				{
 					return false;
 				}
-			}
-			
+			}			
 
 			return true;
 		}

@@ -136,6 +136,7 @@ ATpsPlayer::ATpsPlayer()
 		fireMontage = tempMontage.Object;
 	}
 
+
 	// collision preset 을 PlayerProfile 로 설정
 	GetCapsuleComponent()->SetCollisionProfileName(TEXT("PlayerProfile"));
 	GetMesh()->SetCollisionProfileName(TEXT("NoCollision"));
@@ -185,6 +186,9 @@ void ATpsPlayer::BeginPlay()
 
 	// 인벤토리 Widget 생성
 	inven = CreateWidget<UInvenWidget>(GetWorld(), invenFactory);
+
+
+
  }
 
 // Called every frame
@@ -433,8 +437,7 @@ void ATpsPlayer::EnhancedRealFire()
 					GetWorld(), 
 					impactEffect, 
 					hitInfo.ImpactPoint,
-					rot);
-								
+					rot);								
 
 				// 맞은놈이 Enemy 라면 DAMAGE 상태로 전환
 				if (hitInfo.GetComponent()->GetCollisionObjectType() == ECC_GameTraceChannel1)

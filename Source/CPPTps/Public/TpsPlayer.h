@@ -132,8 +132,6 @@ public:
 
 
 
-
-
 //---------------------------------------------------
 public:
 	UPROPERTY(EditAnywhere)
