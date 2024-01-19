@@ -9,6 +9,7 @@
 #include <Components/CapsuleComponent.h>
 #include <AIController.h>
 #include "Navigation/PathFollowingComponent.h"
+#include <Kismet/KismetMathLibrary.h>
 
 
 // Sets default values for this component's properties
@@ -74,6 +75,9 @@ void UEnemyFSM::TickComponent(float DeltaTime, ELevelTick TickType, FActorCompon
 	case EEnemyState::MOVE:
 		UpdateMove();
 		break;
+	case EEnemyState::PATROL:
+		UpdatePatrol();
+		break;
 	case EEnemyState::ATTACK:
 		UpdateAttack();
 		break;
@@ -123,6 +127,21 @@ void UEnemyFSM::ChangeState(EEnemyState s)
 		break;
 	case EEnemyState::MOVE:
 		break;
+	case EEnemyState::PATROL:
+	{
+		// originPos 기준으로 반경 500 cm 안의 랜덤한 위치를 뽑아서 그 위치로 이동하게한다.
+		// 1. 랜덤한 방향을 뽑자
+		int32 randAngle = FMath::RandRange(0, 359);
+		FRotator rot = FRotator(0, randAngle, 0);
+		FVector randDir = UKismetMathLibrary::GetForwardVector(rot);
+		// 2. 그 방향으로 랜덤한 거리를 뽑자
+		float randDist = FMath::RandRange(100.0f, 500.0f);		
+		// 3. 1, 2 의 값을 이용해서 랜덤한 위치를 뽑자
+		patrolPos = originPos + randDir * randDist;
+		// 그 위치로 이동!
+		ai->MoveToLocation(patrolPos);
+	}
+		break;
 	case EEnemyState::ATTACK:
 	{
 		// 킥, 펀치 공격할지 설정
@@ -163,6 +182,12 @@ void UEnemyFSM::UpdateIdle()
 		// 상태를 Move 로 바꿔라
 		ChangeState(EEnemyState::MOVE);
 	}	
+	// 그렇지 않고 idleDelayTime 을 지났다면
+	else if (IsWaitComplete(idleDelayTime))
+	{
+		// 상태를 PATROL 로 바꿔라
+		ChangeState(EEnemyState::PATROL);
+	}
 }
 
 void UEnemyFSM::UpdateMove()
@@ -193,6 +218,19 @@ void UEnemyFSM::UpdateMove()
 			// 4. 현재 상태를 ATTACK 로 바꾸자
 			ChangeState(EEnemyState::ATTACK);
 		}
+	}
+}
+
+void UEnemyFSM::UpdatePatrol()
+{
+	// 내 위치와 랜덤하게 뽑힌 위치의 거리를 구한다.
+	float dist = FVector::Distance(patrolPos, myActor->GetActorLocation());
+
+	// 그 거리가 0이면
+	if (dist < 50)
+	{
+		// IDLE 상태로 전환
+		ChangeState(EEnemyState::IDLE);
 	}
 }
 
