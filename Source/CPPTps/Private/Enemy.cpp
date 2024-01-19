@@ -33,12 +33,13 @@ AEnemy::AEnemy()
 	// 이동 방향으로 나를 회전 시켜줘 옵션 활성화
 	GetCharacterMovement()->bOrientRotationToMovement = true;
 
-
-
 	// Capsule 컴포넌트 CollisonPreset = EnemyProfile
 	// Mesh 컴포넌트 CollisionPreset = NoCollision
 	GetCapsuleComponent()->SetCollisionProfileName(TEXT("EnemyProfile"));
 	GetMesh()->SetCollisionProfileName(TEXT("NoCollision"));
+
+	//Auto Possess ai 설정 (spawn, placed 둘다 동작하게)
+	AutoPossessAI = EAutoPossessAI::PlacedInWorldOrSpawned;
 }
 
 // Called when the game starts or when spawned
