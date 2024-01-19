@@ -39,7 +39,7 @@ public:
 	UPROPERTY(EditAnywhere)
 	class USpringArmComponent* arm;
 
-	UPROPERTY(EditAnywhere)
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	class UCameraComponent* cam;
 
 	UPROPERTY(EditAnywhere)

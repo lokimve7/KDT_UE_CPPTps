@@ -13,5 +13,9 @@ UCLASS()
 class CPPTPS_API UEnemyHPBar : public UUserWidget
 {
 	GENERATED_BODY()
+
+public:
+	UPROPERTY(EditAnywhere, meta = (BindWidget))
+	class UProgressBar* HPBar;
 	
 };

@@ -8,6 +8,10 @@
 #include <Components/CapsuleComponent.h>
 #include <Components/WidgetComponent.h>
 #include "EnemyHPBar.h"
+#include <Camera/CameraComponent.h>
+#include <Kismet/KismetMathLibrary.h>
+#include <Components/ProgressBar.h>
+
 
 // Sets default values
 AEnemy::AEnemy()
@@ -71,6 +75,18 @@ void AEnemy::BeginPlay()
 void AEnemy::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);	
+
+	if (fsm->target != nullptr)
+	{
+		// 카메라의 앞방향
+		FVector camForward = fsm->target->cam->GetForwardVector();
+		// 카메라의 윗방향
+		FVector camUp = fsm->target->cam->GetUpVector();
+		// 카메라의 앞방향 반대, 윗방향을 향하는 각도를 구해주세요
+		FRotator rot = UKismetMathLibrary::MakeRotFromXZ(-camForward, camUp);
+		// rot 의 값으로 comHPBar 의 각도(월드)로 셋팅
+		comHpBar->SetWorldRotation(rot);
+	}	
 }
 
 // Called to bind functionality to input
@@ -84,6 +100,12 @@ void AEnemy::DamageProcess(int32 damage)
 {
 	// HP 를 줄이자
 	currHP -= damage;
+
+	// HPBar progress Percent 값 설정 (0 ~ 1)
+	UUserWidget* widget = comHpBar->GetWidget();
+	UEnemyHPBar* hpBarWidget = Cast<UEnemyHPBar>(widget);	
+	hpBarWidget->HPBar->SetPercent((float)currHP / maxHP);
+
 	// 만약에 HP 가 0보다 크면
 	if (currHP > 0)
 	{

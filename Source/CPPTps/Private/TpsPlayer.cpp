@@ -196,8 +196,8 @@ void ATpsPlayer::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
-	// MoveAction();
 
+	// MoveAction();
 	// RotateAction();	
 }
 
