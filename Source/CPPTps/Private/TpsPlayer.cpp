@@ -536,7 +536,34 @@ void ATpsPlayer::InputMouseUp()
 {
 	if(onHoverItem == nullptr) return;
 
-	onHoverItem->EndMove();
+	int32 dest = onHoverItem->EndMove();
+
+	// 인벤 밖에 놓았을때
+	if (dest == -1)
+	{
+		onHoverItem->SetPostion();
+	}
+	// 인벤 안이긴 하지만 아이템이 존재하지 않은 위치에 놓았을 때
+	else if (dest >= compInven->myItems.Num())
+	{
+		onHoverItem->SetPostion();
+	}
+	// 다른 아이템 위치에 놓았을 때
+	else
+	{
+		// myItems 데이터를 교환
+		// dest : onHoverItem 이 이동해야하는 Inven 위치(idx)
+		// sour : onHoverItem 이 현재 Inven 있는 위치
+		int32 sour = onHoverItem->idxInInven;
+
+		FItemData temp = compInven->myItems[sour];
+		compInven->myItems[sour] = compInven->myItems[dest];
+		compInven->myItems[dest] = temp;
+
+		// InvenWidget 에 있는 allItemWidget 데이터 교환 (위치도 교환)
+		inven->SwitchItem(dest, sour);
+		//inven->RefreshInven(compInven->myItems);
+	}
 
 
 	onHoverItem = nullptr;

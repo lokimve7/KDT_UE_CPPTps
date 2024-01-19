@@ -47,6 +47,6 @@ public:
 public:
 	void InitItem(FItemData data, int32 idx, UObject* InObject, const FName& InFunctionName);
 	void BeginMove();
-	void EndMove();
+	int32 EndMove();
 	void SetPostion();
 };

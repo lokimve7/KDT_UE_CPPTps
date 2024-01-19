@@ -53,7 +53,7 @@ void UInvenItem::BeginMove()
 	panelSlot->SetZOrder(100);
 }
 
-void UInvenItem::EndMove()
+int32 UInvenItem::EndMove()
 {
 	isMove = false;
 
@@ -67,14 +67,14 @@ void UInvenItem::EndMove()
 	// Inven 안에 존재
 	if (m < 5 && n < 5)
 	{
-		
+		return m + n * 5;
 	}
 	// Inven 밖에 존재
 	else
 	{
-		SetPostion();
+		return -1;
+		//SetPostion();
 	}
-
 }
 
 void UInvenItem::SetPostion()

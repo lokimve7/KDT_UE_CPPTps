@@ -33,4 +33,5 @@ public:
 public:
 	void RefreshInven(TArray<struct FItemData> myItems);
 	void CreateItem(FItemData itemData, int32 i);
+	void SwitchItem(int32 dest, int32 sour);
 };

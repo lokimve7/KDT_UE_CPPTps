@@ -50,3 +50,19 @@ void UInvenWidget::CreateItem(FItemData itemData, int32 i)
 	// itemData 를 만들어진 item 에 알려주자
 	item->InitItem(itemData, i, player, TEXT("OnHoverItem"));
 }
+
+void UInvenWidget::SwitchItem(int32 dest, int32 sour)
+{
+	// dest, sour 에 있는 idxInInven 값을 바꾸자
+	allItemWidget[dest]->idxInInven = sour;
+	allItemWidget[sour]->idxInInven = dest;
+
+	// allItemWidget 에 들어있는 순서도 바꾸자
+	UInvenItem* temp = allItemWidget[sour];
+	allItemWidget[sour] = allItemWidget[dest];
+	allItemWidget[dest] = temp;
+
+	// 서로 바꾼 위치로 다시 갱신하자
+	allItemWidget[dest]->SetPostion();
+	allItemWidget[sour]->SetPostion();
+}
