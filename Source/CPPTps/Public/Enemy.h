@@ -31,6 +31,9 @@ public:
 	class UEnemyFSM* fsm;
 
 	UPROPERTY(EditAnywhere)
+	class UWidgetComponent* comHpBar;
+
+	UPROPERTY(EditAnywhere)
 	int32 maxHP = 3;
 	int32 currHP = 0;
 

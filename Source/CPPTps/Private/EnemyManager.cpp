@@ -35,7 +35,7 @@ void AEnemyManager::BeginPlay()
 		allSpawnPos.Add(tempActor[i]);*/
 
 		// 만약에 이름에 Spawn 이 포함되어 있다면
-		if (tempActor[i]->GetActorLabel().Contains(TEXT("Spawn")))
+		if (tempActor[i]->GetActorLabel().Contains(TEXT("CPP_Spawn")))
 		{
 			// allSpawnPos 에 추가
 			allSpawnPos.Add(tempActor[i]);

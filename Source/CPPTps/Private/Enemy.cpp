@@ -6,6 +6,8 @@
 #include "EnemyFSM.h"
 #include <GameFramework/CharacterMovementComponent.h>
 #include <Components/CapsuleComponent.h>
+#include <Components/WidgetComponent.h>
+#include "EnemyHPBar.h"
 
 // Sets default values
 AEnemy::AEnemy()
@@ -14,7 +16,6 @@ AEnemy::AEnemy()
 	PrimaryActorTick.bCanEverTick = true;
 
 	
-
 	// Skeletal Mesh 읽어오자
 	ConstructorHelpers::FObjectFinder<USkeletalMesh> tempMesh(TEXT("/Script/Engine.SkeletalMesh'/Game/Resources/Enemy/Ch03_nonPBR.Ch03_nonPBR'"));
 	if (tempMesh.Succeeded())
@@ -29,6 +30,21 @@ AEnemy::AEnemy()
 
 	// FSM 컴포넌트 추가
 	fsm = CreateDefaultSubobject<UEnemyFSM>(TEXT("FSM"));
+
+	// Widget 컴포넌트 추가
+	comHpBar = CreateDefaultSubobject<UWidgetComponent>(TEXT("BP_BAR"));
+	comHpBar->SetupAttachment(RootComponent);
+	comHpBar->SetDrawSize(FVector2D(100, 30));
+	comHpBar->SetRelativeLocation(FVector(0, 0, 106));
+
+	// HP Bar Widget 불러와서 셋팅
+	ConstructorHelpers::FClassFinder<UEnemyHPBar> tempHPBar(TEXT("/Script/UMGEditor.WidgetBlueprint'/Game/Blueprints/BP_EnemyHPBar.BP_EnemyHPBar_C'"));
+	if (tempHPBar.Succeeded())
+	{
+		comHpBar->SetWidgetClass(tempHPBar.Class);
+	}
+
+
 
 	// 이동 방향으로 나를 회전 시켜줘 옵션 활성화
 	GetCharacterMovement()->bOrientRotationToMovement = true;
