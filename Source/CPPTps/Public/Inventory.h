@@ -32,7 +32,6 @@ public:
 	FString name;
 };
 
-
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
 class CPPTPS_API UInventory : public UActorComponent
 {

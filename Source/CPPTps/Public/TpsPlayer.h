@@ -4,7 +4,6 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
-
 #include "TpsPlayer.generated.h"
 
 UENUM(BlueprintType)
@@ -162,5 +161,17 @@ public:
 
 	UFUNCTION()
 	void InputLMouseClick();
+
+	UFUNCTION()
+	void InputSort();
 };
 
+
+class FItemSortByType
+{
+public:
+	bool operator() (const FItemData& a, const FItemData& b) const
+	{
+		return a.type > b.type;
+	}
+};
