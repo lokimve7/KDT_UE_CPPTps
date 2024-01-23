@@ -199,6 +199,7 @@ void ATpsPlayer::BeginPlay()
 	// MainWidget 생성 후 화면에 붙이자
 	mainWidget = CreateWidget<UMainWidget>(GetWorld(), mainWidgetFactory);
 	mainWidget->AddToViewport();
+	mainWidget->InitHP(maxHP);
 
 	// currWeaponMode 의 값에 따라서 무기를 선택하자
 	ChangeWeapon(currWeaponMode);
@@ -260,7 +261,7 @@ void ATpsPlayer::DamageProcess(float damage)
 	UE_LOG(LogTemp, Warning, TEXT("curr hp : %f"), currHP);
 	
 	// HP Widget 갱신
-	mainWidget->UpdateHP(currHP, maxHP);
+	mainWidget->UpdateHP(currHP);
 
 	if (currHP <= 0)
 	{

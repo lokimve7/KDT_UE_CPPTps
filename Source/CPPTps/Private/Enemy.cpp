@@ -123,6 +123,6 @@ void AEnemy::DamageProcess(int32 damage)
 
 void AEnemy::AttackTarget()
 {
-	fsm->target->DamageProcess(5);
+	fsm->target->DamageProcess(20);
 }
 
