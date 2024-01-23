@@ -190,10 +190,6 @@ void ATpsPlayer::BeginPlay()
 	// sniper widget 생성
 	sniperUI = CreateWidget<USniperWidget>(GetWorld(), sniperWidget);
 
-	// currWeaponMode 의 값에 따라서 무기를 선택하자
-	ChangeWeapon(currWeaponMode);
-	
-
 	// 인벤토리 Widget 생성
 	inven = CreateWidget<UInvenWidget>(GetWorld(), invenFactory);
 
@@ -203,6 +199,9 @@ void ATpsPlayer::BeginPlay()
 	// MainWidget 생성 후 화면에 붙이자
 	mainWidget = CreateWidget<UMainWidget>(GetWorld(), mainWidgetFactory);
 	mainWidget->AddToViewport();
+
+	// currWeaponMode 의 값에 따라서 무기를 선택하자
+	ChangeWeapon(currWeaponMode);
  }
 
 // Called every frame
@@ -305,6 +304,9 @@ void ATpsPlayer::ChangeWeapon(EWeaponType weaponIdx)
 	// 나의 현재 무기는 weaponIdx 다!! 설정
 	currWeaponMode = weaponIdx;
 
+	// 무기 UI 잘 보이게
+	mainWidget->UpdateWeapon((int32)weaponIdx);
+
 	switch (weaponIdx)
 	{
 	// 만약에 weaponIdx 가 1이면 
@@ -318,6 +320,7 @@ void ATpsPlayer::ChangeWeapon(EWeaponType weaponIdx)
 			// 제거해라 / 화면 축소
 			ZoomInOut(false);
 		}
+		
 		break;
 	// 만약에 weaponIdx 가 2이면 
 	case EWeaponType::SNIPER:
