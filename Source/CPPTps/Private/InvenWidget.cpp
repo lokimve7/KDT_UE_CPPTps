@@ -16,6 +16,8 @@ void UInvenWidget::NativeConstruct()
 
 	// 플레이어를 찾자
 	player = Cast<ATpsPlayer>(UGameplayStatics::GetActorOfClass(GetWorld(), ATpsPlayer::StaticClass()));
+
+	
 }
 
 void UInvenWidget::RefreshInven(TArray<FItemData> myItems)

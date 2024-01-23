@@ -8,6 +8,7 @@
 #include <Components/CapsuleComponent.h>
 #include <Components/WidgetComponent.h>
 #include "EnemyHPBar.h"
+#include "TpsPlayer.h"
 #include <Camera/CameraComponent.h>
 #include <Kismet/KismetMathLibrary.h>
 #include <Components/ProgressBar.h>
