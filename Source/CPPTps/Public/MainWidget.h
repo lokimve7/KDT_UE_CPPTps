@@ -20,4 +20,7 @@ public:
 
 	UPROPERTY(meta = (BindWidget))
 	class UTextBlock* hpText;
+
+public:
+	void UpdateHP(float curHP, float maxHP);
 };

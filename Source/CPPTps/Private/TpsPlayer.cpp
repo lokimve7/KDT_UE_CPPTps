@@ -21,6 +21,7 @@
 #include "InvenWidget.h"
 #include "InvenItem.h"
 #include <Components/CapsuleComponent.h>
+#include "MainWidget.h"
 
 
 
@@ -138,6 +139,13 @@ ATpsPlayer::ATpsPlayer()
 		fireMontage = tempMontage.Object;
 	}
 
+	// MainWidget 블루프린트 가져오자
+	ConstructorHelpers::FClassFinder<UMainWidget> tempMain(TEXT("/Script/UMGEditor.WidgetBlueprint'/Game/Blueprints/BP_MainWidget.BP_MainWidget_C'"));
+	if (tempMain.Succeeded())
+	{
+		mainWidgetFactory = tempMain.Class;
+	}
+
 
 	// collision preset 을 PlayerProfile 로 설정
 	GetCapsuleComponent()->SetCollisionProfileName(TEXT("PlayerProfile"));
@@ -191,6 +199,10 @@ void ATpsPlayer::BeginPlay()
 
 	// 현재 HP 를 MAX HP 로 하자
 	currHP = maxHP;
+
+	// MainWidget 생성 후 화면에 붙이자
+	mainWidget = CreateWidget<UMainWidget>(GetWorld(), mainWidgetFactory);
+	mainWidget->AddToViewport();
  }
 
 // Called every frame
@@ -247,7 +259,9 @@ void ATpsPlayer::DamageProcess(float damage)
 {
 	currHP -= damage;
 	UE_LOG(LogTemp, Warning, TEXT("curr hp : %f"), currHP);
+	
 	// HP Widget 갱신
+	mainWidget->UpdateHP(currHP, maxHP);
 
 	if (currHP <= 0)
 	{

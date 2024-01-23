@@ -14,6 +14,7 @@ enum class EWeaponType : uint8
 	SNIPER
 };
 
+
 UCLASS()
 class CPPTPS_API ATpsPlayer : public ACharacter
 {
@@ -107,6 +108,14 @@ public:
 	// 총 쏘는 몽타주
 	UPROPERTY(EditAnywhere)
 	class UAnimMontage* fireMontage;
+
+	// MainWidget 블루프린트 클래스
+	UPROPERTY(VisibleAnywhere)
+	TSubclassOf<class UMainWidget> mainWidgetFactory;
+	// 만들어진 MainWidget 을 담을 변수
+	UPROPERTY()
+	class UMainWidget* mainWidget;
+
 
 	// 걷기 / 뛰기
 	bool isRun = false;
