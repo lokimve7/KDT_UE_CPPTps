@@ -39,4 +39,5 @@ public:
 
 public:
 	void DamageProcess(int32 damage);
+	void AttackTarget();
 };

@@ -189,8 +189,8 @@ void ATpsPlayer::BeginPlay()
 	// 인벤토리 Widget 생성
 	inven = CreateWidget<UInvenWidget>(GetWorld(), invenFactory);
 
-
-
+	// 현재 HP 를 MAX HP 로 하자
+	currHP = maxHP;
  }
 
 // Called every frame
@@ -241,6 +241,18 @@ void ATpsPlayer::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent
 	PlayerInputComponent->BindAction(TEXT("ItemSort"), IE_Pressed, this, &ATpsPlayer::InputSort);
 
 
+}
+
+void ATpsPlayer::DamageProcess(float damage)
+{
+	currHP -= damage;
+	UE_LOG(LogTemp, Warning, TEXT("curr hp : %f"), currHP);
+	// HP Widget 갱신
+
+	if (currHP <= 0)
+	{
+		// Game Over 처리		
+	}
 }
 
 void ATpsPlayer::MoveAction(FVector2d keyboardInput)

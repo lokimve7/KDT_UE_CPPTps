@@ -111,7 +111,14 @@ public:
 	// °È±â / ¶Ù±â
 	bool isRun = false;
 
+	// ÃÖ´ë HP
+	float maxHP = 100;
+	// ÇöÀç HP
+	float currHP;
+
 public:
+	
+	void DamageProcess(float damage);
 
 	void MoveAction(FVector2d keyboardInput);
 	void RotateAction();
