@@ -22,6 +22,8 @@
 #include "InvenItem.h"
 #include <Components/CapsuleComponent.h>
 #include "MainWidget.h"
+#include "ItemCube.h"
+#include "ItemSphere.h"
 
 
 
@@ -484,6 +486,23 @@ void ATpsPlayer::EnhancedRealFire()
 					AActor* hitActor = hitInfo.GetActor();
 					AEnemy* enemy = Cast<AEnemy>(hitActor);
 					enemy->DamageProcess(1);					
+				}
+				// 맞은놈이 ItemObject 라면 맞았을때 해야하는 행동을 해라
+				else if (hitInfo.GetComponent()->GetCollisionObjectType() == ECC_GameTraceChannel3)
+				{
+					// 만약에 부딪힌 놈이 Cube
+					AItemCube* cube = Cast<AItemCube>(hitInfo.GetActor());
+					if (cube != nullptr)
+					{
+						cube->OnHit();
+					}
+
+					// 만약에 부딪힌 놈이 Sphere
+					AItemSphere* sphere = Cast<AItemSphere>(hitInfo.GetActor());
+					if (sphere != nullptr)
+					{
+						sphere->OnHit();
+					}
 				}
 			}
 		}
