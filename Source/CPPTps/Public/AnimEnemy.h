@@ -10,6 +10,9 @@
 /**
  * 
  */
+
+
+
 UCLASS()
 class CPPTPS_API UAnimEnemy : public UAnimInstance
 {
@@ -25,4 +28,6 @@ public:
 public:
 	UFUNCTION()
 	void AnimNotify_OnDamage();
+
+	void Test(void (*ttt) ());
 };

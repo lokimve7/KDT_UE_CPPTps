@@ -12,6 +12,16 @@ void UMainWidget::NativeTick(const FGeometry& MyGeometry, float InDeltaTime)
 {
 	Super::NativeTick(MyGeometry, InDeltaTime);
 
+	//startHP = FMath::Lerp(startHP, endHP, InDeltaTime * 10);
+	//// hpText 갱신 (50 / 100)
+	//FString strHp = FString::Printf(TEXT("%.0f / %.0f"), startHP, maxHP);
+	//hpText->SetText(FText::FromString(strHp));
+
+	//// hpBar 갱신
+	//float percent = startHP / maxHP;
+	//hpBar->SetPercent(percent);
+	
+
 	if (ratioHP < 1)
 	{
 		ratioHP += InDeltaTime * 4;

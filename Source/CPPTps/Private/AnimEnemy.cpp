@@ -4,6 +4,7 @@
 #include "AnimEnemy.h"
 #include "Enemy.h"
 
+
 void UAnimEnemy::AnimNotify_OnDamage()
 {
 	UE_LOG(LogTemp, Warning, TEXT("OnDamage!!!!!!"));
@@ -14,3 +15,6 @@ void UAnimEnemy::AnimNotify_OnDamage()
 	// 2. target 이 가지고 있는 DamageProcess 함수 실행
 	myPawn->AttackTarget();
 }
+
+
+
