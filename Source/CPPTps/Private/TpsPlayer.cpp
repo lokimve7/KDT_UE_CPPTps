@@ -492,6 +492,7 @@ void ATpsPlayer::EnhancedRealFire()
 				{
 					AItemObject* itemObj = Cast<AItemObject>(hitInfo.GetActor());
 					itemObj->OnHit();
+					GetItem(itemObj->itemType);
 					
 					//// 만약에 부딪힌 놈이 Cube
 					//AItemCube* cube = Cast<AItemCube>(hitInfo.GetActor());
@@ -538,9 +539,16 @@ void ATpsPlayer::InputGetItem(const struct FInputActionValue& value)
 {
 	int32 actionValue = value.Get<float>() ;
 	actionValue--;
+	
+	GetItem((EItemType)actionValue);
+}
+
+void ATpsPlayer::GetItem(EItemType type)
+{
+	int32 itemDBIdx = (int32)type;
 	//actionValue 해당 되는 아이템을 추가( compInven->myItems 에)
 	UTpsGameInstance* gameInstance = Cast<UTpsGameInstance>(UGameplayStatics::GetGameInstance(GetWorld()));
-	compInven->myItems.Add(gameInstance->defineItem[actionValue]);
+	compInven->myItems.Add(gameInstance->defineItem[itemDBIdx]);
 
 	// 만약에 Inven 이 열려있다면 
 	if (inven->IsInViewport())
@@ -600,7 +608,15 @@ void ATpsPlayer::InputMouseUp()
 	// 인벤 밖에 놓았을때
 	if (dest == -1)
 	{
-		onHoverItem->SetPostion();
+		//onHoverItem->SetPostion();
+		InputRMouseClick();
+
+		// 어떤 아이템 (int32)
+		int32 itemType = (int32)onHoverItem->itemData.type;
+		// 아이템을 생성할 위치
+		FVector pos = GetActorLocation() + FVector::UpVector * 200;
+
+		GetWorld()->SpawnActor<AItemObject>(itemObjectFactory[itemType], pos, FRotator::ZeroRotator);
 	}
 	// 인벤 안이긴 하지만 아이템이 존재하지 않은 위치에 놓았을 때
 	else if (dest >= compInven->myItems.Num())

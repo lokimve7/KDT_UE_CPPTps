@@ -53,6 +53,7 @@ public:
 	// 총 UI 나오는 시간
 	float weaponTime;
 
+
 public:
 	void InitHP(float mHP);
 	void UpdateHP(float cHP);

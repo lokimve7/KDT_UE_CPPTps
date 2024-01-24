@@ -2,12 +2,15 @@
 
 
 #include "ItemCube.h"
+#include "Inventory.h"
 
 // Sets default values
 AItemCube::AItemCube()
 {
  	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
+
+	itemType = EItemType::ITEM_CUBE;
 }
 
 // Called when the game starts or when spawned

@@ -14,6 +14,8 @@ enum class EWeaponType : uint8
 	SNIPER
 };
 
+enum class EItemType : uint8;
+
 
 UCLASS()
 class CPPTPS_API ATpsPlayer : public ACharacter
@@ -163,8 +165,13 @@ public:
 	UPROPERTY()
 	class UInvenItem* onHoverItem = nullptr;
 
+	
+	UPROPERTY(EditAnywhere)
+	TArray<TSubclassOf<class AItemObject>> itemObjectFactory;
+
 public:
 	void InputGetItem(const struct FInputActionValue& value);
+	void GetItem(EItemType type);
 	void InputOnOffInventory();
 
 	UFUNCTION()

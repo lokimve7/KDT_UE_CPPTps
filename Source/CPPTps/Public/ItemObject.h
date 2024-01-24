@@ -6,6 +6,9 @@
 #include "GameFramework/Actor.h"
 #include "ItemObject.generated.h"
 
+// eunm 형 전방 선언
+enum class EItemType : uint8;
+
 UCLASS()
 class CPPTPS_API AItemObject : public AActor
 {
@@ -30,6 +33,10 @@ public:
 
 	// 속력
 	float speed = 0;
+
+	// 어떤 Item 인지?
+	UPROPERTY(EditAnywhere)
+	EItemType itemType;
 
 public:
 	// 기본 동작
