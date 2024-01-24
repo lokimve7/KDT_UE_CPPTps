@@ -3,17 +3,17 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "ItemObject.h"
-#include "ItemSphere.generated.h"
+#include "GameFramework/Actor.h"
+#include "ItemObject.generated.h"
 
 UCLASS()
-class CPPTPS_API AItemSphere : public AItemObject
+class CPPTPS_API AItemObject : public AActor
 {
 	GENERATED_BODY()
 	
 public:	
 	// Sets default values for this actor's properties
-	AItemSphere();
+	AItemObject();
 
 protected:
 	// Called when the game starts or when spawned
@@ -23,22 +23,18 @@ public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
-public:	
+public:
+	// 외형
+	UPROPERTY(EditAnywhere)
+	class UStaticMeshComponent* compMesh;
 
-	// 현재 크기 값
-	float scale = 1;
-	
-	// 내가 커지는 상태 / 작아지는 상태
-	bool isGrow = true;
-	int32 scaleDir = 1;
-
-	// NormalState 를 실행하게 할건지 하지 않을건지
-	bool isNormal = true;
+	// 속력
+	float speed = 0;
 
 public:
 	// 기본 동작
-	virtual void NormalState() override;
+	virtual void NormalState();
 
 	// 총에 맞았을때 해야하는 행동
-	virtual void OnHit() override;
+	virtual void OnHit();// = 0; // 순수 가상함수
 };

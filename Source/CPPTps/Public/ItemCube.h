@@ -3,11 +3,11 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "GameFramework/Actor.h"
+#include "ItemObject.h"
 #include "ItemCube.generated.h"
 
 UCLASS()
-class CPPTPS_API AItemCube : public AActor
+class CPPTPS_API AItemCube : public AItemObject
 {
 	GENERATED_BODY()
 	
@@ -24,20 +24,14 @@ public:
 	virtual void Tick(float DeltaTime) override;
 
 public:
-	// 외형
-	UPROPERTY(EditAnywhere)
-	class UStaticMeshComponent* compMesh;
-
 	// 현재 나의 회전값 (Yaw)
-	float yaw = 0;
-	// 회전 한는 속력
-	float speed = 50;
+	float yaw = 0;	
 
 public:
 	// 기본 동작
-	void NormalState();
+	virtual void NormalState() override;
 
 	// 총에 맞았을때 해야하는 행동
-	void OnHit();
+	virtual void OnHit() override;
 
 };

@@ -8,16 +8,14 @@ AItemSphere::AItemSphere()
 {
  	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
-
-	// 외형 설정
-	compMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("MESH"));
-	SetRootComponent(compMesh);
 }
 
 // Called when the game starts or when spawned
 void AItemSphere::BeginPlay()
 {
 	Super::BeginPlay();
+
+	speed = 5;
 }
 
 // Called every frame
@@ -33,6 +31,8 @@ void AItemSphere::Tick(float DeltaTime)
 
 void AItemSphere::NormalState()
 {
+	Super::NormalState();
+
 	// scaleDir 방향으로 크기를 변경시켜줘
 	scale += speed * GetWorld()->GetDeltaSeconds() * scaleDir;
 
@@ -82,6 +82,8 @@ void AItemSphere::NormalState()
 
 void AItemSphere::OnHit()
 {
+	Super::OnHit();
+
 	// isNormal 반대로 동작하게 하자
 	isNormal = !isNormal;
 }
