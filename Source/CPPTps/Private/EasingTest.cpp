@@ -2,6 +2,7 @@
 
 
 #include "EasingTest.h"
+#include "EasingLibrary.h"
 
 // Sets default values
 AEasingTest::AEasingTest()
@@ -61,36 +62,8 @@ void AEasingTest::ScaleEase()
 	ratio += GetWorld()->GetDeltaSeconds() * 3;
 	if(ratio > 1) ratio = 1;
 
-	float s = EaseOutBack(ratio);
+	float s = UEasingLibrary::EaseOutBack(ratio);
 
 	FVector scale = FMath::Lerp(FVector::OneVector, FVector::OneVector * 2, s);
 	SetActorScale3D(scale);
 }
-
-float AEasingTest::EaseOutBounce(float x)
-{
-	const float n1 = 7.5625;
-	const float d1 = 2.75;
-
-	if (x < 1 / d1) {
-		return n1 * x * x;
-	}
-	else if (x < 2 / d1) {
-		return n1 * (x -= 1.5 / d1) * x + 0.75;
-	}
-	else if (x < 2.5 / d1) {
-		return n1 * (x -= 2.25 / d1) * x + 0.9375;
-	}
-	else {
-		return n1 * (x -= 2.625 / d1) * x + 0.984375;
-	}
-}
-
-float AEasingTest::EaseOutBack(float x)
-{
-	const float c1 = 1.70158;
-	const float c3 = c1 + 1;
-
-	return 1 + c3 * FMath::Pow(x - 1, 3) + c1 * FMath::Pow(x - 1, 2);
-}
-

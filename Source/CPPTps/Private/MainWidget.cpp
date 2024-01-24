@@ -7,6 +7,7 @@
 #include <Components/CanvasPanelSlot.h>
 #include <Components/Image.h>
 #include "TpsPlayer.h"
+#include "EasingLibrary.h"
 
 void UMainWidget::NativeTick(const FGeometry& MyGeometry, float InDeltaTime)
 {
@@ -35,7 +36,13 @@ void UMainWidget::NativeTick(const FGeometry& MyGeometry, float InDeltaTime)
 
 		// hpBar 갱신
 		float percent = hp / maxHP;
-		hpBar->SetPercent(percent);
+		hpBar->SetPercent(percent);		
+	}
+
+	// 만약에 나타나야 하는 무기UI 있다면
+	if (weaponType > 0)
+	{
+		ShowWeapon();
 	}
 }
 
@@ -56,15 +63,25 @@ void UMainWidget::UpdateHP(float cHP)
 
 void UMainWidget::UpdateWeapon(int32 type)
 {
+	// UI 가 나타나야 하는 무기 종류
+	weaponType = type;
+	weaponTime = 0;
+
 	EWeaponType e = (EWeaponType)type;
 	if (e == EWeaponType::GUN)
 	{
 		SetWeaponZOrder(2, 0);
+				
+		// weaponSniper 의 위치를 0, 0 으로 하자
+		Cast<UCanvasPanelSlot>(weaponSniper->Slot)->SetPosition(FVector2D::ZeroVector);
 	}
 
 	else if (e == EWeaponType::SNIPER)
 	{
 		SetWeaponZOrder(0, 2);
+
+		// weaponRifle 의 위치를 0, 0 으로 하자
+		Cast<UCanvasPanelSlot>(weaponRifle->Slot)->SetPosition(FVector2D::ZeroVector);
 	}
 }
 
@@ -77,4 +94,31 @@ void UMainWidget::SetWeaponZOrder(int32 rifleZ, int32 sniperZ)
 	// 스나이퍼 총 UI
 	panelSlot = Cast<UCanvasPanelSlot>(sniper->Slot);
 	panelSlot->SetZOrder(sniperZ);
+}
+
+void UMainWidget::ShowWeapon()
+{
+	// 시간을 증가
+	weaponTime += GetWorld()->GetDeltaSeconds();
+
+	// 목적지까지 다 도착했다면
+	if(weaponTime > 1) 
+	{
+		weaponTime = 1;
+
+		// 나타나야하는 무기 UI 를 없앤다.
+		weaponType = 0;
+	}
+
+	float ratio = UEasingLibrary::EaseOutBounce(weaponTime);
+	FVector2D pos = FMath::Lerp(FVector2D::ZeroVector, FVector2D(-300, 0), ratio);
+
+	if (weaponType == 1)
+	{
+		Cast<UCanvasPanelSlot>(weaponRifle->Slot)->SetPosition(pos);
+	}
+	else if(weaponType == 2)
+	{
+		Cast<UCanvasPanelSlot>(weaponSniper->Slot)->SetPosition(pos);
+	}
 }

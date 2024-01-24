@@ -42,7 +42,4 @@ public:
 
 	// Easing Function 으로 크기 키우기
 	void ScaleEase();
-
-	float EaseOutBounce(float x);
-	float EaseOutBack(float x);
 };
