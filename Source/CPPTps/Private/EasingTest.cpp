@@ -58,7 +58,7 @@ void AEasingTest::ScaleLerp()
 
 void AEasingTest::ScaleEase()
 {
-	ratio += GetWorld()->GetDeltaSeconds();
+	ratio += GetWorld()->GetDeltaSeconds() * 3;
 	if(ratio > 1) ratio = 1;
 
 	float s = EaseOutBack(ratio);
